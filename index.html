@@ -403,22 +403,6 @@ tr:hover td{background:#2e2d2b}
       </div>
     </div>
 
-<div class="cl-item t1-blue">
-      <input type="checkbox" id="cVUctrl">
-      <div class="cl-body">
-        <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('cVUctrl',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
-          <a href="https://ecsr.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs/preview/10008100/" target="_blank">🔵 VU Controller's Team — Summer Intern (Hybrid, Job 10008100)</a>
-          <span class="cl-deadline dl-open">🔵 APPLY NOW — rotational program · Oracle ERP · Research Finance rotation · cap-exempt · conversion opportunity</span>
-          <span class="cl-visa ex">Cap-Exempt</span>
-          <span class="cl-prob">14%</span>
-        </div>
-        <div class="cl-meta"><strong>⚡ STRATEGIC PRIORITY — apply today.</strong> Vanderbilt University Controller's Team rotational internship: 4 rotations × ~2 weeks each across (1) Accounting &amp; Financial Reporting, (2) Tax &amp; Financial Leadership, (3) Procurement &amp; Payment Services, (4) <strong>Research Finance (post-award grants, compliance, sponsored research)</strong>. Reports to Associate Vice Chancellor for Finance &amp; Controller. Oracle ERP exposure directly relevant to VU Oracle portal financial analyst roles. <strong>The Research Finance rotation directly fills the grants experience gap blocking JR101618/R-52895/Meharry roles.</strong><br><br>
-        <strong>Why apply:</strong> (1) VU cap-exempt = no lottery risk on any future role; (2) rotational exposure = live reference from AVC Finance level; (3) Research Finance experience = unblocks post-award grants analyst tier; (4) Oracle ERP = direct credential for VU Financial Unit Analyst (10008124) and VU Research FA (c37); (5) highest realistic path to a VU full-time conversion.<br><br>
-        <strong>⚠️ OPT/CPT timing concern:</strong> CPT ends May 2. Summer internship likely starts June. Verify with DSO: (a) when did you file OPT application? (b) did you request May 3 start date? EAD must arrive BEFORE first day of work — confirm EAD arrival timeline with DSO immediately. If EAD is on track for May/June, this is viable. If EAD arrives Aug, start date may need adjustment.<br><br>
-        <strong>Framing for cover letter:</strong> "MBA graduate in Finance (4.0 GPA) with 8 months of cloud FinOps and financial reporting at HCA Healthcare, seeking to deepen institutional finance expertise through VU's Controller rotational program — with particular interest in the Research Finance track and a long-term goal of contributing to VU's post-award research financial administration." Pitch conversion explicitly. Apply at VU Oracle portal: ecsr.fa.us2.oraclecloud.com — search Job 10008100.</div>
-      </div>
-    </div>
-
 <div class="cl-item t1-green">
       <input type="checkbox" id="cvicc1">
       <div class="cl-body">
@@ -1459,6 +1443,17 @@ tr:hover td{background:#2e2d2b}
           <span class="cl-deadline dl-urgent">❌ NOT IN PORTAL — "budget analyst" search Apr 17/18 returned only JR101654, JR101624, JR101618. No Senior Budget Analyst exists in Meharry Workday. Aggregator false positive.</span>
         </div>
         <div class="cl-meta">Meharry Workday "budget analyst" search confirmed: JR101654 (Regional Director), JR101624 (Financial &amp; Data Analyst, applied), JR101618 (Financial Analyst, applied). No Senior Budget Analyst appeared. Same false-positive pattern as cmeharry_sgfs. Do not apply.</div>
+      </div>
+    </div>
+
+<div class="cl-item" style="opacity:0.4">
+      <input type="checkbox" id="cVUctrl" checked>
+      <div class="cl-body">
+        <div class="cl-title" style="text-decoration:line-through">
+          VU Controller's Team — Summer Intern (Hybrid, Job 10008100)
+          <span class="cl-deadline dl-urgent">❌ POSTING CLOSED — confirmed gone from VU Oracle by Apr 18. Summer rotational programs at VU fill in Jan–Feb; April is late in cycle. Struck.</span>
+        </div>
+        <div class="cl-meta">Job 10008100 was live on Apr 17 and gone by Apr 18 — less than 48 hours. Summer 2026 structured rotational internships at major universities typically close their application windows in January–February. Competitive MBA candidates applied months earlier. Worth monitoring Oracle for a Summer 2027 cycle posting (typically appears Oct–Nov 2026). The Research Finance rotation remains the most valuable exposure gap-filler if the role re-opens.</div>
       </div>
     </div></div>
   </details>
@@ -2776,35 +2771,44 @@ render(sort(ROWS));
 <script id="tracker-tests" type="text/javascript">
 // Self-contained sanity tests — run on every page load, output to console only
 (function runTests() {
+  // Custom assert — avoids console.assert compatibility issues
+  const fails = [];
+  function assert(cond, msg) { if (!cond) fails.push(msg); }
+
   try {
     // Test 1: pAtLeastOne basic
     const mockRoles = [{[0]:0,[1]:'',[2]:'Cap-Exempt',[5]:'Open',[6]:10,[7]:80000,[16]:false}];
     const p = pAtLeastOne(mockRoles, 0);
-    console.assert(Math.abs(p - 10) < 0.01, 'Test 1 FAIL: pAtLeastOne(10%) should be 10, got '+p);
+    assert(Math.abs(p - 10) < 0.01, 'T1: pAtLeastOne(10%) should be 10, got '+p.toFixed(3));
 
     // Test 2: lottery adjustment (10% offer × 46% lottery = 4.6% effective)
     const pLott = pAtLeastOne(mockRoles, 46);
-    console.assert(Math.abs(pLott - 4.6) < 0.01, 'Test 2 FAIL: lottery-adj should be 4.6%, got '+pLott);
+    assert(Math.abs(pLott - 4.6) < 0.01, 'T2: lottery-adj should be 4.6%, got '+pLott.toFixed(3));
 
     // Test 3: two independent roles at 10% each → P(≥1) ≈ 19%
-    const twoRoles = [mockRoles[0], mockRoles[0]];
-    const p2 = pAtLeastOne(twoRoles, 0);
-    console.assert(Math.abs(p2 - 19) < 0.01, 'Test 3 FAIL: two 10% roles should give 19%, got '+p2);
+    const p2 = pAtLeastOne([mockRoles[0], mockRoles[0]], 0);
+    assert(Math.abs(p2 - 19) < 0.01, 'T3: two 10% roles → 19%, got '+p2.toFixed(3));
 
-    // Test 4: FIELD schema — status is index 5
-    console.assert(FIELD.status === 5, 'Test 4 FAIL: FIELD.status should be 5, got '+FIELD.status);
+    // Test 4: FIELD schema
+    assert(FIELD.status === 5, 'T4: FIELD.status should be 5, got '+FIELD.status);
+    assert(FIELD.prob   === 6, 'T4: FIELD.prob should be 6, got '+FIELD.prob);
+    assert(FIELD.avoid  === 16,'T4: FIELD.avoid should be 16, got '+FIELD.avoid);
 
-    // Test 5: activeRoles returns only Open/Applied with prob>0
+    // Test 5: activeRoles only returns Open/Applied with prob>0
     const active = activeRoles('all');
-    const hasInactive = active.some(r => {
+    const badRow = active.find(r => {
       const st = r[FIELD.status]||'';
       return !['Open','Applied','Applied-Pending','Interviewing'].some(s=>st.startsWith(s));
     });
-    console.assert(!hasInactive, 'Test 5 FAIL: activeRoles returned non-active rows');
+    assert(!badRow, 'T5: activeRoles returned non-active row: '+(badRow&&badRow[FIELD.role]));
 
-    console.log('%c✅ Tracker tests passed ('+active.length+' active roles)', 'color:#1d9e75;font-weight:500');
+    if (fails.length === 0) {
+      console.log('%c✅ Tracker tests passed — '+active.length+' active roles', 'color:#1d9e75;font-weight:500');
+    } else {
+      fails.forEach(f => console.warn('❌ FAIL:', f));
+    }
   } catch(e) {
-    console.warn('Tracker test error:', e);
+    console.warn('Tracker test error:', e.message||e);
   }
 })();
 </script>
