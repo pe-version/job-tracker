@@ -2441,9 +2441,11 @@ function computeLiveProbs(mode){
   let pne=1;
   exempt.forEach(r=>{const p=adjustedProb(r,outcomes,mults);pne*=(1-p/100);});
   let pns=1;
-  subj.forEach(r=>{const p=adjustedProb(r,outcomes,mults);pns*=(1-p/100);});
+  // Apply lottery factor per-role: effective prob = offer_prob × lottery_win_chance
+  subj.forEach(r=>{const p=adjustedProb(r,outcomes,mults);pns*=(1-(p*lv)/100);});
 
   const comb=(1-pne*pns)*100;
+  // Overall P(visa secured) = P(current employer lottery) + P(miss lottery) × P(>=1 offer from search)
   const ovr=(lv+(1-lv)*(comb/100))*100;
   const rej=Object.values(outcomes).filter(v=>v==='rejected').length;
   const iview=Object.values(outcomes).filter(v=>v==='interviewing').length;
@@ -2495,7 +2497,7 @@ buildProb=function(){
   document.getElementById('pval-exempt').textContent=p.exempt+'%';
   document.getElementById('psub-exempt').textContent=p.exemptN+' active roles'+(corrActive?' (corr. adj.)':'');
   document.getElementById('pval-subj').textContent=p.subj+'%';
-  document.getElementById('psub-subj').textContent=p.subjN+' active roles'+(corrActive?' (corr. adj.)':'');
+  document.getElementById('psub-subj').textContent=p.subjN+' cap-subject · L'+pmLv+' lottery-adj';
   document.getElementById('pval-comb').textContent=p.comb+'%';
   document.getElementById('psub-comb').textContent='P(zero) = '+zeroP+'%'+(p.rej?' · '+p.rej+' rejected':'')+(p.iview?' · '+p.iview+' interviewing':'')+(p.app?' · '+p.app+' applied':'');
   document.getElementById('pval-ovr').textContent=p.ovr+'%';
