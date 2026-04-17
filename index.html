@@ -128,67 +128,74 @@ tr:hover td{background:#2e2d2b}
 .tier-avoid td{background:#2a1818 !important}
 }
 </style>
+
+<style>
+#_copy_changes_bar{position:sticky;top:0;z-index:200;background:var(--color-background-primary,#fff);border-bottom:1px solid var(--color-border-tertiary,#e2e8f0);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+#_changes_count{font-size:12px;color:var(--color-text-secondary,#64748b);flex:1;}
+._copy_btn{padding:5px 14px;border-radius:6px;border:1px solid #4f6ef7;background:#4f6ef7;color:#fff;font-size:12px;font-weight:500;cursor:pointer;}
+._copy_btn:hover{background:#3b5bdb;border-color:#3b5bdb;}
+._clear_btn{padding:5px 12px;border-radius:6px;border:1px solid var(--color-border-secondary,#cbd5e1);background:transparent;color:var(--color-text-secondary,#64748b);font-size:12px;cursor:pointer;}
+._clear_btn:hover{background:var(--color-background-secondary,#f8fafc);}
+#_copy_toast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#e2e8f0;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;pointer-events:none;}
+._dead_modal_overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;}
+._dead_modal{background:var(--color-background-primary,#fff);border-radius:10px;padding:1.5rem;width:340px;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+._dead_modal h3{margin:0 0 0.5rem;font-size:15px;font-weight:500;color:var(--color-text-primary,#1e293b);}
+._dead_modal p{margin:0 0 1rem;font-size:13px;color:var(--color-text-secondary,#64748b);}
+._dead_modal textarea{width:100%;box-sizing:border-box;padding:8px;border-radius:6px;border:1px solid var(--color-border-secondary,#cbd5e1);font-size:13px;resize:none;margin-bottom:1rem;font-family:inherit;background:var(--color-background-secondary,#f8fafc);color:var(--color-text-primary,#1e293b);}
+._dead_modal_btns{display:flex;gap:8px;justify-content:flex-end;}
+._dead_confirm{padding:6px 16px;border-radius:6px;border:none;background:#e24b4a;color:#fff;font-size:13px;cursor:pointer;font-weight:500;}
+._dead_cancel{padding:6px 16px;border-radius:6px;border:1px solid var(--color-border-secondary,#cbd5e1);background:transparent;color:var(--color-text-secondary,#64748b);font-size:13px;cursor:pointer;}
+</style>
 <script>
 (function(){
   var HASH = "46ce5fb6e5b64288afc704145b4a877257255eca7579956c42ced02e04c62bc4";
   var SESSION_KEY = "jt_auth";
   function hexDigest(buf) {
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
   }
   async function checkPw(pw) {
     var enc = new TextEncoder().encode(pw);
-    var buf = await crypto.subtle.digest('SHA-256', enc);
+    var buf = await crypto.subtle.digest("SHA-256", enc);
     return hexDigest(buf) === HASH;
   }
   function showTracker() {
-    var ov = document.getElementById('_pw_overlay');
+    var ov = document.getElementById("_pw_overlay");
     if (ov) ov.remove();
-    document.getElementById('_tracker_wrap').style.display = '';
+    var w = document.getElementById("_tracker_wrap");
+    if (w) w.style.display = "";
   }
   function buildOverlay() {
-    document.body.style.margin = '0';
-    var wrap = document.getElementById('_tracker_wrap');
-    if (wrap) wrap.style.display = 'none';
-    var ov = document.createElement('div');
-    ov.id = '_pw_overlay';
-    ov.style.cssText = 'position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:system-ui,sans-serif;';
-    ov.innerHTML = `
-      <div style="background:#1a1d27;border:1px solid #2d3148;border-radius:12px;padding:2.5rem 2rem;width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
-        <div style="font-size:2rem;margin-bottom:0.5rem;">🔒</div>
-        <div style="color:#e2e8f0;font-size:1.1rem;font-weight:500;margin-bottom:0.25rem;">Job Search Tracker</div>
-        <div style="color:#94a3b8;font-size:0.8rem;margin-bottom:1.5rem;">Enter your access password to continue</div>
-        <input id="_pw_input" type="password" placeholder="Password"
-          style="width:100%;box-sizing:border-box;padding:0.6rem 0.8rem;border-radius:7px;border:1px solid #3d4468;background:#0f1117;color:#e2e8f0;font-size:0.95rem;margin-bottom:0.75rem;outline:none;"
-          autocomplete="current-password" />
-        <div id="_pw_err" style="color:#f87171;font-size:0.8rem;min-height:1.1rem;margin-bottom:0.5rem;"></div>
-        <button id="_pw_btn"
-          style="width:100%;padding:0.65rem;border-radius:7px;border:none;background:#4f6ef7;color:#fff;font-size:0.95rem;font-weight:500;cursor:pointer;">
-          Unlock
-        </button>
-      </div>`;
-    document.body.prepend(ov);
-    var inp = document.getElementById('_pw_input');
-    var btn = document.getElementById('_pw_btn');
-    var err = document.getElementById('_pw_err');
+    var wrap = document.getElementById("_tracker_wrap");
+    if (wrap) wrap.style.display = "none";
+    var ov = document.createElement("div");
+    ov.id = "_pw_overlay";
+    ov.style.cssText = "position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:system-ui,sans-serif;";
+    var box = document.createElement("div");
+    box.style.cssText = "background:#1a1d27;border:1px solid #2d3148;border-radius:12px;padding:2.5rem 2rem;width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5);";
+    box.innerHTML = "<div style=\"font-size:2rem;margin-bottom:0.5rem;\">&#x1F512;</div><div style=\"color:#e2e8f0;font-size:1.1rem;font-weight:500;margin-bottom:0.25rem;\">Job Search Tracker</div><div style=\"color:#94a3b8;font-size:0.8rem;margin-bottom:1.5rem;\">Enter your access password to continue</div>";
+    var inp = document.createElement("input");
+    inp.type = "password"; inp.placeholder = "Password"; inp.id = "_pw_input"; inp.autocomplete = "current-password";
+    inp.style.cssText = "width:100%;box-sizing:border-box;padding:0.6rem 0.8rem;border-radius:7px;border:1px solid #3d4468;background:#0f1117;color:#e2e8f0;font-size:0.95rem;margin-bottom:0.75rem;outline:none;";
+    var err = document.createElement("div");
+    err.id = "_pw_err"; err.style.cssText = "color:#f87171;font-size:0.8rem;min-height:1.1rem;margin-bottom:0.5rem;";
+    var btn = document.createElement("button");
+    btn.id = "_pw_btn"; btn.textContent = "Unlock";
+    btn.style.cssText = "width:100%;padding:0.65rem;border-radius:7px;border:none;background:#4f6ef7;color:#fff;font-size:0.95rem;font-weight:500;cursor:pointer;";
+    box.appendChild(inp); box.appendChild(err); box.appendChild(btn);
+    ov.appendChild(box); document.body.prepend(ov);
     async function attempt() {
       var ok = await checkPw(inp.value);
-      if (ok) {
-        sessionStorage.setItem(SESSION_KEY, '1');
-        showTracker();
-      } else {
-        err.textContent = 'Incorrect password — please try again.';
-        inp.value = '';
-        inp.focus();
-      }
+      if (ok) { sessionStorage.setItem("46ce5fb6", "1"); showTracker(); }
+      else { err.textContent = "Incorrect password — please try again."; inp.value = ""; inp.focus(); }
     }
-    btn.addEventListener('click', attempt);
-    inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') attempt(); });
+    btn.addEventListener("click", attempt);
+    inp.addEventListener("keydown", function(e) { if (e.key === "Enter") attempt(); });
     inp.focus();
   }
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
-    document.addEventListener('DOMContentLoaded', showTracker);
+  if (sessionStorage.getItem("46ce5fb6") === "1") {
+    document.addEventListener("DOMContentLoaded", showTracker);
   } else {
-    document.addEventListener('DOMContentLoaded', buildOverlay);
+    document.addEventListener("DOMContentLoaded", buildOverlay);
   }
 })();
 </script>
@@ -321,6 +328,11 @@ tr:hover td{background:#2e2d2b}
 <div class="checklist-section">
   <h2>📋 Application Checklist — Next Actions</h2>
   <p class="cl-sub">Sorted by urgency then probability. Check off as you submit. <strong>Updated April 17, 2026 — Two verification sweeps + 300-round search complete. All tiers reorganised.</strong></p>
+<div id="_copy_changes_bar">
+  <span id="_changes_count">No unsynced changes.</span>
+  <button class="_copy_btn" onclick="copyChangesForClaude()">Copy changes for Claude</button>
+  <button class="_clear_btn" onclick="clearChangesLog()">Clear log</button>
+</div>
 <div id="_copy_changes_bar">
   <span id="_changes_count">No unsynced changes.</span>
   <button class="_copy_btn" onclick="copyChangesForClaude()">Copy changes for Claude</button>
@@ -1286,7 +1298,7 @@ tr:hover td{background:#2e2d2b}
   </div>
 
 
-  <details style="margin-top:2rem;">
+  <details id="_archive_details" style="margin-top:2rem;">
     <summary style="cursor:pointer;color:var(--color-text-secondary,#94a3b8);font-size:0.8rem;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;padding:0.5rem 0;list-style:none;display:flex;align-items:center;gap:0.5rem;">
       <span style="font-size:0.7rem;">&#9654;</span>
       Archive — 15 closed · duplicate · false positive · withdrawn
@@ -2439,104 +2451,18 @@ render(sort(ROWS));
 })();
 </script>
 
-<style>
-#_copy_changes_bar {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  background: var(--color-background-primary, #fff);
-  border-bottom: 1px solid var(--color-border-tertiary, #e2e8f0);
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-#_changes_count {
-  font-size: 12px;
-  color: var(--color-text-secondary, #64748b);
-  flex: 1;
-}
-._copy_btn {
-  padding: 5px 14px;
-  border-radius: 6px;
-  border: 1px solid #4f6ef7;
-  background: #4f6ef7;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-}
-._copy_btn:hover { background: #3b5bdb; border-color: #3b5bdb; }
-._clear_btn {
-  padding: 5px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--color-border-secondary, #cbd5e1);
-  background: transparent;
-  color: var(--color-text-secondary, #64748b);
-  font-size: 12px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-._clear_btn:hover { background: var(--color-background-secondary, #f8fafc); }
-#_copy_toast {
-  display: none;
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1e293b;
-  color: #e2e8f0;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 13px;
-  z-index: 9999;
-  pointer-events: none;
-}
-._dead_modal_overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-._dead_modal {
-  background: var(--color-background-primary, #fff);
-  border-radius: 10px;
-  padding: 1.5rem;
-  width: 340px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-}
-._dead_modal h3 { margin: 0 0 0.5rem; font-size: 15px; font-weight: 500; }
-._dead_modal p { margin: 0 0 1rem; font-size: 13px; color: var(--color-text-secondary, #64748b); }
-._dead_modal textarea {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--color-border-secondary, #cbd5e1);
-  font-size: 13px;
-  resize: none;
-  margin-bottom: 1rem;
-  font-family: inherit;
-  background: var(--color-background-secondary, #f8fafc);
-  color: var(--color-text-primary, #1e293b);
-}
-._dead_modal_btns { display: flex; gap: 8px; justify-content: flex-end; }
-._dead_confirm { padding: 6px 16px; border-radius: 6px; border: none; background: #e24b4a; color: #fff; font-size: 13px; cursor: pointer; font-weight: 500; }
-._dead_cancel  { padding: 6px 16px; border-radius: 6px; border: 1px solid var(--color-border-secondary, #cbd5e1); background: transparent; color: var(--color-text-secondary, #64748b); font-size: 13px; cursor: pointer; }
-</style>
 
+
+<div id="_copy_toast"></div>
 <script>
 (function() {
-  var STORE_KEY = 'jt_changes_v1';
+  var STORE_KEY = "jt_changes_v1";
 
   function loadChanges() {
-    try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch(e) { return []; }
+    try { return JSON.parse(localStorage.getItem(STORE_KEY) || "[]"); }
+    catch(e) { return []; }
   }
+
   function saveChanges(arr) {
     localStorage.setItem(STORE_KEY, JSON.stringify(arr));
   }
@@ -2544,207 +2470,203 @@ render(sort(ROWS));
   function getTitle(itemId) {
     var el = document.getElementById(itemId);
     if (!el) return itemId;
-    var a = el.closest('.cl-item').querySelector('a');
-    if (a) return a.textContent.trim().replace(/^[🔴🟡🟠🟢✅⬜⚠️]+\s*/,'').substring(0,60);
-    var t = el.closest('.cl-item').querySelector('.cl-title');
-    return t ? t.textContent.trim().substring(0,60) : itemId;
+    var item = el.closest(".cl-item");
+    if (!item) return itemId;
+    var a = item.querySelector("a");
+    if (a) return a.textContent.trim().replace(/^[\u{1F534}\u{1F7E0}\u{1F7E1}\u{1F7E2}\u2705\u2610\u26A0\uFE0F\s]+/u, "").substring(0, 60);
+    var t = item.querySelector(".cl-title");
+    return t ? t.textContent.trim().substring(0, 60) : itemId;
   }
 
   function updateBar() {
     var changes = loadChanges();
-    var bar = document.getElementById('_changes_count');
+    var bar = document.getElementById("_changes_count");
     if (!bar) return;
     if (changes.length === 0) {
-      bar.textContent = 'No unsynced changes.';
+      bar.textContent = "No unsynced changes.";
     } else {
-      var dead    = changes.filter(function(c){return c.action==='dead';}).length;
-      var applied = changes.filter(function(c){return c.action==='applied';}).length;
+      var dead    = changes.filter(function(c) { return c.action === "dead"; }).length;
+      var applied = changes.filter(function(c) { return c.action === "applied"; }).length;
       var parts = [];
-      if (dead)    parts.push(dead + ' marked dead');
-      if (applied) parts.push(applied + ' checked off');
-      bar.textContent = parts.join(' · ') + ' — unsynced';
+      if (dead)    parts.push(dead + " marked dead");
+      if (applied) parts.push(applied + " checked off");
+      bar.textContent = parts.join(" \u00B7 ") + " \u2014 unsynced";
     }
   }
 
   function showToast(msg) {
-    var t = document.getElementById('_copy_toast');
+    var t = document.getElementById("_copy_toast");
+    if (!t) return;
     t.textContent = msg;
-    t.style.display = 'block';
-    setTimeout(function(){ t.style.display = 'none'; }, 2500);
+    t.style.display = "block";
+    setTimeout(function() { t.style.display = "none"; }, 2800);
   }
 
-  // Mark dead: show modal, then strike + archive + log
+  function executeMarkDead(itemId, title, note) {
+    var changes = loadChanges();
+    changes = changes.filter(function(c) { return c.id !== itemId; });
+    changes.push({ id: itemId, title: title, action: "dead", timestamp: new Date().toISOString(), note: note || "" });
+    saveChanges(changes);
+
+    var el = document.getElementById(itemId);
+    if (!el) return;
+    var item = el.closest(".cl-item");
+    if (!item) return;
+    item.style.opacity = "0.4";
+    var titleDiv = item.querySelector(".cl-title");
+    if (titleDiv) titleDiv.style.textDecoration = "line-through";
+    var btn = item.querySelector("._dead_btn");
+    if (btn) btn.remove();
+
+    var archiveDet = document.getElementById("_archive_details");
+    var archiveCont = document.getElementById("_archive_container");
+    if (archiveCont) {
+      archiveCont.appendChild(item);
+      if (archiveDet) archiveDet.open = true;
+    }
+    updateBar();
+    showToast("Marked as dead \u00B7 recorded for sync");
+  }
+
   window.markDead = function(itemId, evt) {
     evt.stopPropagation();
     var title = getTitle(itemId);
-    
-    // Build modal
-    var overlay = document.createElement('div');
-    overlay.className = '_dead_modal_overlay';
-    overlay.innerHTML =
-      '<div class="_dead_modal">' +
-        '<h3>Mark as closed / not in portal?</h3>' +
-        '<p>' + title.substring(0,55) + (title.length>55?'…':'') + '</p>' +
-        '<textarea id="_dead_note" rows="2" placeholder="Optional note (e.g. not in Workday, role closed, applied elsewhere)"></textarea>' +
-        '<div class="_dead_modal_btns">' +
-          '<button class="_dead_cancel" onclick="this.closest('._dead_modal_overlay').remove()">Cancel</button>' +
-          '<button class="_dead_confirm" id="_dead_confirm_btn">Confirm</button>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(overlay);
-    document.getElementById('_dead_note').focus();
 
-    document.getElementById('_dead_confirm_btn').onclick = function() {
-      var note = document.getElementById('_dead_note').value.trim();
+    var overlay = document.createElement("div");
+    overlay.className = "_dead_modal_overlay";
+
+    var modal = document.createElement("div");
+    modal.className = "_dead_modal";
+
+    var h3 = document.createElement("h3");
+    h3.textContent = "Mark as closed / not in portal?";
+
+    var p = document.createElement("p");
+    p.textContent = title.substring(0, 55) + (title.length > 55 ? "\u2026" : "");
+
+    var ta = document.createElement("textarea");
+    ta.id = "_dead_note";
+    ta.rows = 2;
+    ta.placeholder = "Optional note (e.g. not in Workday, role closed, 404)";
+
+    var btnRow = document.createElement("div");
+    btnRow.className = "_dead_modal_btns";
+
+    var cancelBtn = document.createElement("button");
+    cancelBtn.className = "_dead_cancel";
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.onclick = function() { overlay.remove(); };
+
+    var confirmBtn = document.createElement("button");
+    confirmBtn.className = "_dead_confirm";
+    confirmBtn.textContent = "Confirm";
+    confirmBtn.onclick = function() {
+      var note = ta.value.trim();
       overlay.remove();
       executeMarkDead(itemId, title, note);
     };
-    // Close on backdrop click
-    overlay.addEventListener('click', function(e){
-      if (e.target === overlay) overlay.remove();
-    });
+
+    btnRow.appendChild(cancelBtn);
+    btnRow.appendChild(confirmBtn);
+    modal.appendChild(h3);
+    modal.appendChild(p);
+    modal.appendChild(ta);
+    modal.appendChild(btnRow);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener("click", function(e) { if (e.target === overlay) overlay.remove(); });
+    ta.focus();
   };
 
-  function executeMarkDead(itemId, title, note) {
-    // Log the change
-    var changes = loadChanges();
-    changes = changes.filter(function(c){ return c.id !== itemId; }); // dedup
-    changes.push({
-      id: itemId,
-      title: title,
-      action: 'dead',
-      timestamp: new Date().toISOString(),
-      note: note || ''
-    });
-    saveChanges(changes);
-
-    // Strike the item visually
-    var el = document.getElementById(itemId);
-    if (!el) return;
-    var item = el.closest('.cl-item');
-    item.style.opacity = '0.4';
-    var titleDiv = item.querySelector('.cl-title');
-    if (titleDiv) titleDiv.style.textDecoration = 'line-through';
-    var btn = item.querySelector('._dead_btn');
-    if (btn) btn.remove();
-
-    // Move to archive
-    var archive = document.getElementById('_archive_container');
-    if (archive) {
-      archive.appendChild(item);
-      // Open the archive details if closed
-      var det = archive.closest('details');
-      if (det) det.open = true;
-    }
-
-    updateBar();
-    showToast('Marked as dead · recorded for sync');
-  }
-
-  // Track checkbox changes as "applied"
-  function trackCheckbox(cb) {
-    var itemId = cb.id;
-    if (!itemId || !itemId.startsWith('c')) return;
-    if (!cb.checked) return; // only track checking, not unchecking
-    var title = getTitle(itemId);
-    var changes = loadChanges();
-    // Don't double-log items already marked dead
-    if (changes.find(function(c){ return c.id===itemId && c.action==='dead'; })) return;
-    changes = changes.filter(function(c){ return c.id !== itemId; });
-    changes.push({
-      id: itemId,
-      title: title,
-      action: 'applied',
-      timestamp: new Date().toISOString(),
-      note: ''
-    });
-    saveChanges(changes);
-    updateBar();
-  }
-
-  // Copy changes to clipboard
   window.copyChangesForClaude = function() {
     var changes = loadChanges();
-    if (changes.length === 0) {
-      showToast('No changes to copy.');
-      return;
-    }
-    var now = new Date().toLocaleString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
-    var lines = ['TRACKER UPDATE — ' + now, ''];
-    var dead    = changes.filter(function(c){return c.action==='dead';});
-    var applied = changes.filter(function(c){return c.action==='applied';});
+    if (changes.length === 0) { showToast("No changes to copy."); return; }
+    var now = new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+    var lines = ["TRACKER UPDATE \u2014 " + now, ""];
+    var dead    = changes.filter(function(c) { return c.action === "dead"; });
+    var applied = changes.filter(function(c) { return c.action === "applied"; });
     if (dead.length) {
-      lines.push('MARKED AS DEAD (' + dead.length + ' items):');
+      lines.push("MARKED AS DEAD (" + dead.length + " items):");
       dead.forEach(function(c) {
-        var d = new Date(c.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-        lines.push('  · [' + c.id + '] ' + c.title + ' — ' + d + (c.note ? ' · note: "' + c.note + '"' : ''));
+        var d = new Date(c.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        lines.push("  \u00B7 [" + c.id + "] " + c.title + " \u2014 " + d + (c.note ? " \u00B7 note: \"" + c.note + "\"" : ""));
       });
-      lines.push('');
+      lines.push("");
     }
     if (applied.length) {
-      lines.push('CHECKED OFF AS APPLIED (' + applied.length + ' items):');
+      lines.push("CHECKED OFF AS APPLIED (" + applied.length + " items):");
       applied.forEach(function(c) {
-        var d = new Date(c.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-        lines.push('  · [' + c.id + '] ' + c.title + ' — ' + d);
+        var d = new Date(c.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        lines.push("  \u00B7 [" + c.id + "] " + c.title + " \u2014 " + d);
       });
-      lines.push('');
+      lines.push("");
     }
-    lines.push('--- paste this into Claude to sync the tracker ---');
-    var text = lines.join('\n');
-    navigator.clipboard.writeText(text).then(function(){
-      showToast('Copied! Paste into a message to sync.');
-    }).catch(function(){
-      // fallback
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      showToast('Copied! Paste into a message to sync.');
-    });
+    lines.push("--- paste this into Claude to sync the tracker ---");
+    var text = lines.join("\n");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast("Copied! Paste into a message to sync.");
+      }).catch(function() { fallbackCopy(text); });
+    } else { fallbackCopy(text); }
   };
+
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); showToast("Copied! Paste into a message to sync."); }
+    catch(e) { showToast("Could not copy \u2014 please copy manually."); }
+    document.body.removeChild(ta);
+  }
 
   window.clearChangesLog = function() {
-    if (!confirm('Clear all unsynced changes? Only do this after the tracker has been updated by Claude.')) return;
+    if (!confirm("Clear all unsynced changes? Only do this after the tracker has been updated by Claude.")) return;
     localStorage.removeItem(STORE_KEY);
     updateBar();
-    showToast('Changes log cleared.');
+    showToast("Changes log cleared.");
   };
 
-  // Re-apply dead status from localStorage on page load
   function reapplyDeadStatus() {
     var changes = loadChanges();
-    changes.filter(function(c){return c.action==='dead';}).forEach(function(c){
+    changes.filter(function(c) { return c.action === "dead"; }).forEach(function(c) {
       var el = document.getElementById(c.id);
       if (!el) return;
-      var item = el.closest('.cl-item');
-      if (!item) return;
-      if (item.style.opacity === '0.4') return; // already struck
-      item.style.opacity = '0.4';
-      var titleDiv = item.querySelector('.cl-title');
-      if (titleDiv) titleDiv.style.textDecoration = 'line-through';
-      var btn = item.querySelector('._dead_btn');
+      var item = el.closest(".cl-item");
+      if (!item || item.style.opacity === "0.4") return;
+      item.style.opacity = "0.4";
+      var titleDiv = item.querySelector(".cl-title");
+      if (titleDiv) titleDiv.style.textDecoration = "line-through";
+      var btn = item.querySelector("._dead_btn");
       if (btn) btn.remove();
-      var archive = document.getElementById('_archive_container');
-      if (archive) archive.appendChild(item);
+      var archiveCont = document.getElementById("_archive_container");
+      if (archiveCont) archiveCont.appendChild(item);
     });
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
-    // Wire up checkboxes
-    document.querySelectorAll('.cl-item input[type=checkbox]').forEach(function(cb){
-      cb.addEventListener('change', function(){ trackCheckbox(cb); });
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".cl-item input[type=checkbox]").forEach(function(cb) {
+      cb.addEventListener("change", function() {
+        if (!cb.checked) return;
+        var itemId = cb.id;
+        if (!itemId || !itemId.startsWith("c")) return;
+        var title = getTitle(itemId);
+        var changes = loadChanges();
+        if (changes.find(function(c) { return c.id === itemId && c.action === "dead"; })) return;
+        changes = changes.filter(function(c) { return c.id !== itemId; });
+        changes.push({ id: itemId, title: title, action: "applied", timestamp: new Date().toISOString(), note: "" });
+        saveChanges(changes);
+        updateBar();
+      });
     });
-    // Reapply dead status
     reapplyDeadStatus();
-    // Update bar
     updateBar();
   });
 })();
-</script>
 
-<div id="_copy_toast"></div>
+</script>
 
 
 </div>
