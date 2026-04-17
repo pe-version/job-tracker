@@ -154,7 +154,7 @@ tr:hover td{background:#2e2d2b}
   function showTracker(){
     var ov=document.getElementById("_pw_overlay");if(ov)ov.remove();
     var w=document.getElementById("_tracker_wrap");if(w)w.style.display="";
-    if(typeof buildProb==="function")buildProb();
+    setTimeout(function(){if(typeof buildProb==="function")buildProb();},50);
   }
   function buildOverlay(){
     var wrap=document.getElementById("_tracker_wrap");if(wrap)wrap.style.display="none";
@@ -2174,27 +2174,74 @@ const PM={
 const LV={1:[15,85],2:[30,70],3:[46,54],4:[61,39]};
 
 function buildProb(){
-  const d=PM[pmMode], lv=LV[pmLv];
-  document.getElementById('pval-exempt').textContent=d.exempt;
-  document.getElementById('psub-exempt').textContent=d.exemptSub;
-  document.getElementById('pval-subj').textContent=d.subj;
-  document.getElementById('psub-subj').textContent=d.subjSub;
-  document.getElementById('pval-comb').textContent=d.comb;
-  document.getElementById('psub-comb').textContent=d.combSub;
-  document.getElementById('pval-ovr').textContent=d.ovr[pmLv];
-  document.getElementById('psub-ovr').textContent='L'+pmLv+' · lottery + search';
-  document.getElementById('pt-root').textContent=d.root;
-  document.getElementById('pt-win').textContent='Win · '+lv[0]+'%';
-  document.getElementById('pt-miss').textContent='Miss · '+lv[1]+'%';
-  document.getElementById('pt-miss-lbl').textContent=d.missLbl;
-  document.getElementById('pt-miss-sub').textContent=d.missSub;
-  document.getElementById('pt-pexempt').textContent=d.pExempt;
-  document.getElementById('pt-exempt-sub').textContent=d.exemptPath;
-  document.getElementById('pt-psubj').textContent=d.pSubj;
-  document.getElementById('pt-subj-sub').textContent=d.subjPath;
-  document.getElementById('pt-comb').textContent='Combined P(≥1) = '+d.comb;
-  document.getElementById('pt-zero').textContent=d.zero;
-  document.getElementById('pt-delta').style.opacity=d.delta?'1':'0';
+  // Live calculation from ROWS — always current
+  const lv = LV[pmLv];
+  const activeStatuses = ['Open','Applied','Applied-Pending','Interviewing'];
+
+  // Filter ROWS to only genuinely active roles
+  let pool = ROWS.filter(r => {
+    if (r[16]) return false;                          // skip flagged/hidden
+    const st = r[5];
+    if (!activeStatuses.some(s => st.startsWith(s))) return false;
+    const prob = r[6];
+    if (!prob || prob <= 0) return false;
+    // Sponsor-viable mode: require payMid >= threshold
+    if (pmMode === 's75') {
+      const pay = r[7] || 0;
+      const visa = r[2] || '';
+      if (visa === 'Cap-Exempt' && pay < 50000) return false;
+      if (visa === 'Cap-Subject' && pay < 70000) return false;
+    }
+    return true;
+  });
+
+  const exempt = pool.filter(r => r[2] === 'Cap-Exempt' || r[2] === 'Direct Outreach');
+  const subj   = pool.filter(r => r[2] === 'Cap-Subject');
+
+  function pAtLeastOne(arr) {
+    let pNone = 1.0;
+    arr.forEach(r => { pNone *= (1 - r[6] / 100); });
+    return (1 - pNone) * 100;
+  }
+
+  const pe = pAtLeastOne(exempt);
+  const ps = pAtLeastOne(subj);
+  // Cap-subject: needs lottery win (pmLv odds) before offer matters
+  const psAdj = ps * (lv[0] / 100);
+  // Combined: P(≥1 from exempt OR ≥1 from subject after lottery win)
+  const pNoneExempt = 1 - pe / 100;
+  const pNoneSubj   = 1 - psAdj / 100;
+  const pc = (1 - pNoneExempt * pNoneSubj) * 100;
+  const povr = pc;
+  const pZero = 100 - pc;
+
+  const fmt  = v => v.toFixed(1) + '%';
+  const fmtN = n => n === 0 ? '—' : fmt(n);
+
+  // Metric cards
+  document.getElementById('pval-exempt').textContent = fmtN(pe);
+  document.getElementById('psub-exempt').textContent = exempt.length + ' cap-exempt active roles';
+  document.getElementById('pval-subj').textContent   = fmtN(psAdj);
+  document.getElementById('psub-subj').textContent   = subj.length + ' cap-subject · L' + pmLv + ' lottery (' + lv[0] + '%)';
+  document.getElementById('pval-comb').textContent   = fmtN(pc);
+  document.getElementById('psub-comb').textContent   = 'P(zero offer) = ' + fmt(pZero);
+  document.getElementById('pval-ovr').textContent    = fmtN(povr);
+  document.getElementById('psub-ovr').textContent    = 'L' + pmLv + ' · lottery + search';
+
+  // SVG tree nodes
+  const modeLabel = pmMode === 's75' ? 'sponsor-viable' : 'active';
+  document.getElementById('pt-root').textContent      = 'Apply to all ' + pool.length + ' ' + modeLabel + ' roles';
+  document.getElementById('pt-win').textContent       = 'Win · ' + lv[0] + '%';
+  document.getElementById('pt-miss').textContent      = 'Miss · ' + lv[1] + '%';
+  document.getElementById('pt-miss-lbl').textContent  = 'Enter job search';
+  document.getElementById('pt-miss-sub').textContent  = pool.length + ' roles in parallel';
+  document.getElementById('pt-pexempt').textContent   = fmtN(pe);
+  document.getElementById('pt-exempt-sub').textContent = exempt.length + ' cap-exempt · VU · VUMC · Meharry · TN Gov';
+  document.getElementById('pt-psubj').textContent     = fmtN(psAdj);
+  document.getElementById('pt-subj-sub').textContent  = subj.length + ' cap-subject · lottery-adjusted';
+  document.getElementById('pt-comb').textContent      = 'Combined P(\u22651) = ' + fmtN(pc);
+  document.getElementById('pt-zero').textContent      = 'P(no offer via either path) = ' + fmt(pZero);
+  document.getElementById('pt-delta').style.opacity   = '0';
 }
 
 function buildEngProb(){
