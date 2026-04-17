@@ -151,7 +151,11 @@ tr:hover td{background:#2e2d2b}
   var HASH="46ce5fb6e5b64288afc704145b4a877257255eca7579956c42ced02e04c62bc4";var SK="46ce5fb6";
   function hexDigest(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");}
   async function checkPw(pw){var enc=new TextEncoder().encode(pw);var buf=await crypto.subtle.digest("SHA-256",enc);return hexDigest(buf)===HASH;}
-  function showTracker(){var ov=document.getElementById("_pw_overlay");if(ov)ov.remove();var w=document.getElementById("_tracker_wrap");if(w)w.style.display="";}
+  function showTracker(){
+    var ov=document.getElementById("_pw_overlay");if(ov)ov.remove();
+    var w=document.getElementById("_tracker_wrap");if(w)w.style.display="";
+    if(typeof buildProb==="function")buildProb();
+  }
   function buildOverlay(){
     var wrap=document.getElementById("_tracker_wrap");if(wrap)wrap.style.display="none";
     var ov=document.createElement("div");ov.id="_pw_overlay";
@@ -1494,22 +1498,22 @@ tr:hover td{background:#2e2d2b}
 <div class="prob-metrics">
   <div class="prob-metric">
     <div class="pm-lbl" id="plbl-exempt">Cap-exempt P(≥1 offer)</div>
-    <div class="pm-val" id="pval-exempt">63.9%</div>
+    <div class="pm-val" id="pval-exempt">78.5%</div>
     <div class="pm-sub" id="psub-exempt">11 roles incl. Below $75K</div>
   </div>
   <div class="prob-metric">
     <div class="pm-lbl">Cap-subject P(≥1+visa)</div>
-    <div class="pm-val" id="pval-subj">16.1%</div>
+    <div class="pm-val" id="pval-subj">17.3%</div>
     <div class="pm-sub" id="psub-subj">3 roles</div>
   </div>
   <div class="prob-metric">
     <div class="pm-lbl">P(≥1 offer) from search</div>
-    <div class="pm-val good" id="pval-comb">69.7%</div>
-    <div class="pm-sub" id="psub-comb">P(zero) = 30.3%</div>
+    <div class="pm-val good" id="pval-comb">82.2%</div>
+    <div class="pm-sub" id="psub-comb">P(zero) = 17.8%</div>
   </div>
   <div class="prob-metric">
     <div class="pm-lbl">Overall P(visa secured)</div>
-    <div class="pm-val good" id="pval-ovr">66.6%</div>
+    <div class="pm-val good" id="pval-ovr">82.2%</div>
     <div class="pm-sub" id="psub-ovr">L3 · lottery + search</div>
   </div>
 </div>
@@ -1535,7 +1539,7 @@ tr:hover td{background:#2e2d2b}
 <!-- Root node -->
 <g class="pn-gray">
   <rect x="230" y="18" width="220" height="40" rx="7" stroke-width="0.5"/>
-  <text class="ptxt-b" id="pt-root" x="340" y="43" text-anchor="middle">Apply to all 36 roles</text>
+  <text class="ptxt-b" id="pt-root" x="340" y="43" text-anchor="middle">Apply to all 32 active roles</text>
 </g>
 <line x1="340" y1="58" x2="340" y2="94" class="parr"/>
 
@@ -1561,35 +1565,35 @@ tr:hover td{background:#2e2d2b}
 <g class="pn-amber">
   <rect x="422" y="220" width="200" height="50" rx="7" stroke-width="0.5"/>
   <text class="ptxt-b" id="pt-miss-lbl" x="522" y="240" text-anchor="middle">Enter job search</text>
-  <text class="ptxt-s" id="pt-miss-sub" x="522" y="258" text-anchor="middle">36 roles in parallel</text>
+  <text class="ptxt-s" id="pt-miss-sub" x="522" y="258" text-anchor="middle">32 roles in parallel</text>
 </g>
 
 <!-- Exempt branch -->
 <path d="M468,270 L468,322 L412,322 L412,346" class="parr"/>
-<text class="ptxt-s" id="pt-pexempt" x="436" y="316" text-anchor="middle">94.5%</text>
+<text class="ptxt-s" id="pt-pexempt" x="436" y="316" text-anchor="middle">78.5%</text>
 <g class="pn-teal">
   <rect x="337" y="346" width="150" height="50" rx="7" stroke-width="0.5"/>
   <text class="ptxt-b" x="412" y="366" text-anchor="middle">Cap-exempt path</text>
-  <text class="ptxt-s" id="pt-exempt-sub" x="412" y="384" text-anchor="middle">19 roles · VU · VUMC</text>
+  <text class="ptxt-s" id="pt-exempt-sub" x="412" y="384" text-anchor="middle">20 cap-exempt · VU · VUMC · Meharry · TN</text>
 </g>
 <text class="ptxt-s ptxt-ok" x="412" y="412" text-anchor="middle">No further lottery</text>
 
 <!-- Subject branch -->
 <path d="M576,270 L576,322 L582,322 L582,346" class="parr"/>
-<text class="ptxt-s" id="pt-psubj" x="612" y="316" text-anchor="start">74.9%</text>
+<text class="ptxt-s" id="pt-psubj" x="612" y="316" text-anchor="start">17.3%</text>
 <g class="pn-coral">
   <rect x="507" y="346" width="140" height="50" rx="7" stroke-width="0.5"/>
   <text class="ptxt-b" x="577" y="366" text-anchor="middle">Cap-subject path</text>
-  <text class="ptxt-s" id="pt-subj-sub" x="577" y="384" text-anchor="middle">17 roles · FY2028</text>
+  <text class="ptxt-s" id="pt-subj-sub" x="577" y="384" text-anchor="middle">12 cap-subject · FY2028 lottery</text>
 </g>
 <text class="ptxt-s ptxt-warn" x="577" y="412" text-anchor="middle">FY2028 lottery</text>
 
 <!-- Combined band -->
 <g class="pn-teal">
   <rect x="352" y="426" width="256" height="30" rx="6" stroke-width="0.5"/>
-  <text class="ptxt-b ptxt-ok" id="pt-comb" x="480" y="446" text-anchor="middle">Combined P(≥1) = 98.6%</text>
+  <text class="ptxt-b ptxt-ok" id="pt-comb" x="480" y="446" text-anchor="middle">Combined P(≥1) = 82.2%</text>
 </g>
-<text class="ptxt-s ptxt-mute" id="pt-zero" x="480" y="478" text-anchor="middle">P(no offer via either path) = 1.4%</text>
+<text class="ptxt-s ptxt-mute" id="pt-zero" x="480" y="478" text-anchor="middle">P(no offer via either path) = 17.8%</text>
 
 <!-- Delta ribbon (75k mode) -->
 <g id="pt-delta" style="opacity:0;transition:opacity .2s">
@@ -1678,24 +1682,24 @@ tr:hover td{background:#2e2d2b}
       <div class="cc-val">14 → 10</div>
       <div class="cc-sub">4 below $75K excluded</div></div>
     <div class="cmp-card"><div class="cc-lbl">Cap-exempt P(≥1)</div>
-      <div class="cc-val">63.9% → 57.5%</div>
+      <div class="cc-val">78.5% → 71.0%</div>
       <div class="cc-sub">-6.4 pp · 4 roles out</div></div>
     <div class="cmp-card"><div class="cc-lbl">Combined P(≥1)</div>
-      <div class="cc-val">69.7% → 63.2%</div>
+      <div class="cc-val">82.2% → 74.5%</div>
       <div class="cc-sub">-6.5 pp overall</div></div>
     <div class="cmp-card"><div class="cc-lbl">Overall (L3)</div>
-      <div class="cc-val">66.6% → 60.1%</div>
+      <div class="cc-val">82.2% → 74.5%</div>
       <div class="cc-sub">-6.5 pp with lottery</div></div>
   </div>
 </div>
     <div class="cmp-card"><div class="cc-lbl">Cap-exempt P(≥1)</div>
-      <div class="cc-val">63.9% → 57.5%</div>
+      <div class="cc-val">78.5% → 71.0%</div>
       <div class="cc-sub">-6.4 pp · 4 roles out</div></div>
     <div class="cmp-card"><div class="cc-lbl">Combined P(≥1)</div>
-      <div class="cc-val">71.0% → 64.7%</div>
+      <div class="cc-val">83.1% → 75.4%</div>
       <div class="cc-sub">-6.3 pp overall</div></div>
     <div class="cmp-card"><div class="cc-lbl">Overall (L3)</div>
-      <div class="cc-val">67.2% → 60.8%</div>
+      <div class="cc-val">83.2% → 75.5%</div>
       <div class="cc-sub">-6.4 pp with lottery</div></div>
   </div>
 
@@ -1810,7 +1814,7 @@ tr:hover td{background:#2e2d2b}
 </div>
     <div class="cmp-card">
       <div class="cc-lbl">Cap-exempt P(≥1)</div>
-      <div class="cc-val">63.9% → 57.5%</div>
+      <div class="cc-val">78.5% → 71.0%</div>
       <div class="cc-sub">-6.4 pp · 4 roles out</div>
     </div>
     <div class="cmp-card">
@@ -2707,6 +2711,7 @@ render(sort(ROWS));
     });
     reapplyDeadStatus();
     updateBar();
+    if(typeof buildProb==="function") buildProb();
   });
 })();
 
