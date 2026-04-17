@@ -2418,16 +2418,16 @@ function computeLiveProbs(mode){
   });
   if(hasOffer)return{offerIn:true};
 
-  // Active = non-avoid, not rejected, in mode scope
+  // Active = Open/Applied/Interviewing status, non-zero prob, not rejected, in mode scope
+  const activeStatuses=['Open','Applied','Applied-Pending','Interviewing'];
   const active=ROWS.filter(r=>{
     if(r[16])return false;
+    // Must have an active status
+    const st=r[5]||'';
+    if(!activeStatuses.some(s=>st.startsWith(s)))return false;
+    // Must have positive probability
+    if((r[6]||0)<=0)return false;
     if(mode==='s75'){
-      // Tiered sponsor-viable filter (April 2026)
-      // Cap-exempt: $50K livability floor (no lottery risk, H-1B any time)
-      // Cap-subject: $70K floor (≈ L3 for Budget/Treasury Analyst SOC 13-2031/13-2099;
-      //   true L3 for Financial Analyst 13-2051 is ~$88-95K but $70K is employer econ floor)
-      // Note: DOL NPRM (March 26, 2026) proposes raising L3 threshold to 70th pct —
-      //   comment period ends late May 2026; would push L3 to ~$80K+ if finalized.
       if(r[2]==='Cap-Exempt'&&r[7]<50000)return false;
       if(r[2]==='Cap-Subject'&&r[7]<70000)return false;
     }
