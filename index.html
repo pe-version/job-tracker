@@ -1485,8 +1485,8 @@ tr:hover td{background:#2e2d2b}
 
 <div class="prob-controls">
   <span class="pc-lbl">Show probabilities for:</span>
-  <button class="ptab-btn on" id="pm-all" onclick="pmSwitch('all')">All 32 active roles</button>
-  <button class="ptab-btn" id="pm-75" onclick="pmSwitch('s75')">Sponsor-viable (26 roles)</button>
+  <button class="ptab-btn on" id="pm-all" onclick="pmSwitch('all')" id="pm-all-lbl">All roles</button>
+  <button class="ptab-btn" id="pm-75" onclick="pmSwitch('s75')" id="pm-75-lbl">Sponsor-viable</button>
   <button class="ptab-btn" id="pm-eng" onclick="pmSwitch('eng')">Applied / Engaged</button>
   <span class="pc-lbl" style="margin-left:8px">FY2027 wage level:</span>
   <button class="ptab-btn" id="plv1" onclick="plvSwitch(1)">L1 · 15%</button>
@@ -1498,23 +1498,23 @@ tr:hover td{background:#2e2d2b}
 <div class="prob-metrics">
   <div class="prob-metric">
     <div class="pm-lbl" id="plbl-exempt">Cap-exempt P(≥1 offer)</div>
-    <div class="pm-val" id="pval-exempt">78.5%</div>
-    <div class="pm-sub" id="psub-exempt">11 roles incl. Below $75K</div>
+    <div class="pm-val" id="pval-exempt">—</div>
+    <div class="pm-sub" id="psub-exempt">calculating…</div>
   </div>
   <div class="prob-metric">
     <div class="pm-lbl">Cap-subject P(≥1+visa)</div>
-    <div class="pm-val" id="pval-subj">17.3%</div>
-    <div class="pm-sub" id="psub-subj">3 roles</div>
+    <div class="pm-val" id="pval-subj">—</div>
+    <div class="pm-sub" id="psub-subj">calculating…</div>
   </div>
   <div class="prob-metric">
     <div class="pm-lbl">P(≥1 offer) from search</div>
-    <div class="pm-val good" id="pval-comb">82.2%</div>
-    <div class="pm-sub" id="psub-comb">P(zero) = 17.8%</div>
+    <div class="pm-val good" id="pval-comb">—</div>
+    <div class="pm-sub" id="psub-comb">calculating…</div>
   </div>
   <div class="prob-metric">
     <div class="pm-lbl">Overall P(visa secured)</div>
-    <div class="pm-val good" id="pval-ovr">82.2%</div>
-    <div class="pm-sub" id="psub-ovr">L3 · lottery + search</div>
+    <div class="pm-val good" id="pval-ovr">—</div>
+    <div class="pm-sub" id="psub-ovr">calculating…</div>
   </div>
 </div>
 
@@ -1539,7 +1539,7 @@ tr:hover td{background:#2e2d2b}
 <!-- Root node -->
 <g class="pn-gray">
   <rect x="230" y="18" width="220" height="40" rx="7" stroke-width="0.5"/>
-  <text class="ptxt-b" id="pt-root" x="340" y="43" text-anchor="middle">Apply to all 32 active roles</text>
+  <text class="ptxt-b" id="pt-root" x="340" y="43" text-anchor="middle">loading…</text>
 </g>
 <line x1="340" y1="58" x2="340" y2="94" class="parr"/>
 
@@ -1565,35 +1565,35 @@ tr:hover td{background:#2e2d2b}
 <g class="pn-amber">
   <rect x="422" y="220" width="200" height="50" rx="7" stroke-width="0.5"/>
   <text class="ptxt-b" id="pt-miss-lbl" x="522" y="240" text-anchor="middle">Enter job search</text>
-  <text class="ptxt-s" id="pt-miss-sub" x="522" y="258" text-anchor="middle">32 roles in parallel</text>
+  <text class="ptxt-s" id="pt-miss-sub" x="522" y="258" text-anchor="middle">—</text>
 </g>
 
 <!-- Exempt branch -->
 <path d="M468,270 L468,322 L412,322 L412,346" class="parr"/>
-<text class="ptxt-s" id="pt-pexempt" x="436" y="316" text-anchor="middle">78.5%</text>
+<text class="ptxt-s" id="pt-pexempt" x="436" y="316" text-anchor="middle">—</text>
 <g class="pn-teal">
   <rect x="337" y="346" width="150" height="50" rx="7" stroke-width="0.5"/>
   <text class="ptxt-b" x="412" y="366" text-anchor="middle">Cap-exempt path</text>
-  <text class="ptxt-s" id="pt-exempt-sub" x="412" y="384" text-anchor="middle">20 cap-exempt · VU · VUMC · Meharry · TN</text>
+  <text class="ptxt-s" id="pt-exempt-sub" x="412" y="384" text-anchor="middle">—</text>
 </g>
 <text class="ptxt-s ptxt-ok" x="412" y="412" text-anchor="middle">No further lottery</text>
 
 <!-- Subject branch -->
 <path d="M576,270 L576,322 L582,322 L582,346" class="parr"/>
-<text class="ptxt-s" id="pt-psubj" x="612" y="316" text-anchor="start">17.3%</text>
+<text class="ptxt-s" id="pt-psubj" x="612" y="316" text-anchor="start">—</text>
 <g class="pn-coral">
   <rect x="507" y="346" width="140" height="50" rx="7" stroke-width="0.5"/>
   <text class="ptxt-b" x="577" y="366" text-anchor="middle">Cap-subject path</text>
-  <text class="ptxt-s" id="pt-subj-sub" x="577" y="384" text-anchor="middle">12 cap-subject · FY2028 lottery</text>
+  <text class="ptxt-s" id="pt-subj-sub" x="577" y="384" text-anchor="middle">—</text>
 </g>
 <text class="ptxt-s ptxt-warn" x="577" y="412" text-anchor="middle">FY2028 lottery</text>
 
 <!-- Combined band -->
 <g class="pn-teal">
   <rect x="352" y="426" width="256" height="30" rx="6" stroke-width="0.5"/>
-  <text class="ptxt-b ptxt-ok" id="pt-comb" x="480" y="446" text-anchor="middle">Combined P(≥1) = 82.2%</text>
+  <text class="ptxt-b ptxt-ok" id="pt-comb" x="480" y="446" text-anchor="middle">—</text>
 </g>
-<text class="ptxt-s ptxt-mute" id="pt-zero" x="480" y="478" text-anchor="middle">P(no offer via either path) = 17.8%</text>
+<text class="ptxt-s ptxt-mute" id="pt-zero" x="480" y="478" text-anchor="middle">—</text>
 
 <!-- Delta ribbon (75k mode) -->
 <g id="pt-delta" style="opacity:0;transition:opacity .2s">
@@ -1679,27 +1679,27 @@ tr:hover td{background:#2e2d2b}
   <div class="pc-title">Impact of $75K floor vs. full 14-role set</div>
   <div class="compare-grid">
     <div class="cmp-card"><div class="cc-lbl">Roles in search</div>
-      <div class="cc-val">14 → 10</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">4 below $75K excluded</div></div>
     <div class="cmp-card"><div class="cc-lbl">Cap-exempt P(≥1)</div>
-      <div class="cc-val">78.5% → 71.0%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-6.4 pp · 4 roles out</div></div>
     <div class="cmp-card"><div class="cc-lbl">Combined P(≥1)</div>
-      <div class="cc-val">82.2% → 74.5%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-6.5 pp overall</div></div>
     <div class="cmp-card"><div class="cc-lbl">Overall (L3)</div>
-      <div class="cc-val">82.2% → 74.5%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-6.5 pp with lottery</div></div>
   </div>
 </div>
     <div class="cmp-card"><div class="cc-lbl">Cap-exempt P(≥1)</div>
-      <div class="cc-val">78.5% → 71.0%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-6.4 pp · 4 roles out</div></div>
     <div class="cmp-card"><div class="cc-lbl">Combined P(≥1)</div>
-      <div class="cc-val">83.1% → 75.4%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-6.3 pp overall</div></div>
     <div class="cmp-card"><div class="cc-lbl">Overall (L3)</div>
-      <div class="cc-val">83.2% → 75.5%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-6.4 pp with lottery</div></div>
   </div>
 
@@ -1814,51 +1814,51 @@ tr:hover td{background:#2e2d2b}
 </div>
     <div class="cmp-card">
       <div class="cc-lbl">Cap-exempt P(≥1)</div>
-      <div class="cc-val">78.5% → 71.0%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-6.4 pp · 4 roles out</div>
     </div>
     <div class="cmp-card">
       <div class="cc-lbl">Combined P(≥1)</div>
-      <div class="cc-val">68.8% → 62.0%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-6.8 pp overall</div>
     </div>
     <div class="cmp-card">
       <div class="cc-lbl">Overall (L3)</div>
-      <div class="cc-val">66.2% → 59.6%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-6.6 pp with lottery</div>
     </div>
   </div>
 </div>
     <div class="cmp-card">
       <div class="cc-lbl">Cap-exempt P(≥1)</div>
-      <div class="cc-val">66.5% → 57.5%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-9.0 pp · 5 roles out</div>
     </div>
     <div class="cmp-card">
       <div class="cc-lbl">Combined P(≥1)</div>
-      <div class="cc-val">71.0% → 62.0%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-9.0 pp overall</div>
     </div>
     <div class="cmp-card">
       <div class="cc-lbl">Overall (L3)</div>
-      <div class="cc-val">68.5% → 59.6%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">-8.9 pp with lottery</div>
     </div>
   </div>
 </div>
     <div class="cmp-card">
       <div class="cc-lbl">Cap-exempt P(≥1)</div>
-      <div class="cc-val">68.5% → 57.5%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">−11.0 pp · 6 roles out</div>
     </div>
     <div class="cmp-card">
       <div class="cc-lbl">Combined P(≥1)</div>
-      <div class="cc-val">72.7% → 62.0%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">−10.7 pp overall</div>
     </div>
     <div class="cmp-card">
       <div class="cc-lbl">Overall (L3)</div>
-      <div class="cc-val">70.4% → 59.6%</div>
+      <div class="cc-val">—</div>
       <div class="cc-sub">−10.8 pp with lottery</div>
     </div>
   </div>
@@ -2146,103 +2146,12 @@ function switchTab(t){
 // ── Probability tree ──────────────────────────────────────────
 let pmMode='all', pmLv=3;
 
-const PM={
-  all:{exempt:'78.5%',exemptSub:'20 cap-exempt roles · VU · VUMC · Meharry · TN Gov · Metro',
-       subj:'17.3%',subjSub:'12 cap-subject roles · lottery-adjusted L3 (46%)',
-       comb:'82.2%',combSub:'P(zero offer) = 17.8%',
-       root:'Apply to all 32 active roles',
-       missLbl:'Enter job search',missSub:'32 roles in parallel',
-       exemptPath:'20 cap-exempt · VU · VUMC · Meharry · TSU · TN Gov · Metro Nashville',
-       subjPath:'12 cap-subject · lottery · Oct 1 start',
-       pExempt:'78.5%',pSubj:'17.3%',
-       combTree:'Combined P(≥1 offer) = 82.2%',
-       zero:'P(zero offer via either path) = 17.8%',
-       ovr:{1:'83.1%',2:'84.0%',3:'84.9%',4:'85.8%'},delta:false},
-  s75:{exempt:'77.6%',exemptSub:'19 cap-exempt \u2265$50K · no lottery · H-1B any time',
-       subj:'12.2%',subjSub:'7 cap-subject \u2265$70K (\u2248L3 Budget/Treasury SOC)',
-       comb:'80.3%',combSub:'P(zero offer) = 19.7%',
-       root:'Sponsor-viable roles only (26 of 32 active)',
-       missLbl:'Enter job search',missSub:'26 sponsor-viable roles',
-       exemptPath:'19 cap-exempt \u2265$50K · any-time H-1B · no wage risk',
-       subjPath:'7 cap-subject \u2265$70K · L3 wage-weighted odds',
-       pExempt:'77.6%',pSubj:'12.2%',
-       combTree:'Combined P(\u22651 sponsor-viable offer) = 80.3%',
-       zero:'P(zero sponsor-viable offer) = 19.7%',
-       ovr:{1:'81.1%',2:'81.9%',3:'82.7%',4:'83.5%'},delta:false}
-};
+// PM object removed — computeLiveProbs() calculates live from ROWS
 
 const LV={1:[15,85],2:[30,70],3:[46,54],4:[61,39]};
 
-function buildProb(){
-  // Live calculation from ROWS — always current
-  const lv = LV[pmLv];
-  const activeStatuses = ['Open','Applied','Applied-Pending','Interviewing'];
+// buildProb: see live override below
 
-  // Filter ROWS to only genuinely active roles
-  let pool = ROWS.filter(r => {
-    if (r[16]) return false;                          // skip flagged/hidden
-    const st = r[5];
-    if (!activeStatuses.some(s => st.startsWith(s))) return false;
-    const prob = r[6];
-    if (!prob || prob <= 0) return false;
-    // Sponsor-viable mode: require payMid >= threshold
-    if (pmMode === 's75') {
-      const pay = r[7] || 0;
-      const visa = r[2] || '';
-      if (visa === 'Cap-Exempt' && pay < 50000) return false;
-      if (visa === 'Cap-Subject' && pay < 70000) return false;
-    }
-    return true;
-  });
-
-  const exempt = pool.filter(r => r[2] === 'Cap-Exempt' || r[2] === 'Direct Outreach');
-  const subj   = pool.filter(r => r[2] === 'Cap-Subject');
-
-  function pAtLeastOne(arr) {
-    let pNone = 1.0;
-    arr.forEach(r => { pNone *= (1 - r[6] / 100); });
-    return (1 - pNone) * 100;
-  }
-
-  const pe = pAtLeastOne(exempt);
-  const ps = pAtLeastOne(subj);
-  // Cap-subject: needs lottery win (pmLv odds) before offer matters
-  const psAdj = ps * (lv[0] / 100);
-  // Combined: P(≥1 from exempt OR ≥1 from subject after lottery win)
-  const pNoneExempt = 1 - pe / 100;
-  const pNoneSubj   = 1 - psAdj / 100;
-  const pc = (1 - pNoneExempt * pNoneSubj) * 100;
-  const povr = pc;
-  const pZero = 100 - pc;
-
-  const fmt  = v => v.toFixed(1) + '%';
-  const fmtN = n => n === 0 ? '—' : fmt(n);
-
-  // Metric cards
-  document.getElementById('pval-exempt').textContent = fmtN(pe);
-  document.getElementById('psub-exempt').textContent = exempt.length + ' cap-exempt active roles';
-  document.getElementById('pval-subj').textContent   = fmtN(psAdj);
-  document.getElementById('psub-subj').textContent   = subj.length + ' cap-subject · L' + pmLv + ' lottery (' + lv[0] + '%)';
-  document.getElementById('pval-comb').textContent   = fmtN(pc);
-  document.getElementById('psub-comb').textContent   = 'P(zero offer) = ' + fmt(pZero);
-  document.getElementById('pval-ovr').textContent    = fmtN(povr);
-  document.getElementById('psub-ovr').textContent    = 'L' + pmLv + ' · lottery + search';
-
-  // SVG tree nodes
-  const modeLabel = pmMode === 's75' ? 'sponsor-viable' : 'active';
-  document.getElementById('pt-root').textContent      = 'Apply to all ' + pool.length + ' ' + modeLabel + ' roles';
-  document.getElementById('pt-win').textContent       = 'Win · ' + lv[0] + '%';
-  document.getElementById('pt-miss').textContent      = 'Miss · ' + lv[1] + '%';
-  document.getElementById('pt-miss-lbl').textContent  = 'Enter job search';
-  document.getElementById('pt-miss-sub').textContent  = pool.length + ' roles in parallel';
-  document.getElementById('pt-pexempt').textContent   = fmtN(pe);
-  document.getElementById('pt-exempt-sub').textContent = exempt.length + ' cap-exempt · VU · VUMC · Meharry · TN Gov';
-  document.getElementById('pt-psubj').textContent     = fmtN(psAdj);
-  document.getElementById('pt-subj-sub').textContent  = subj.length + ' cap-subject · lottery-adjusted';
-  document.getElementById('pt-comb').textContent      = 'Combined P(\u22651) = ' + fmtN(pc);
-  document.getElementById('pt-zero').textContent      = 'P(no offer via either path) = ' + fmt(pZero);
-  document.getElementById('pt-delta').style.opacity   = '0';
-}
 
 function buildEngProb(){
   const outcomes=getOutcomes();
@@ -2492,6 +2401,11 @@ buildProb=function(){
   }
   renderCorrActive(p.notes);
   const lv={1:15,2:30,3:46,4:61}[pmLv];
+  // Update button labels with live counts
+  const _allLbl=document.getElementById('pm-all-lbl');
+  if(_allLbl) _allLbl.textContent='All '+(p.exemptN+(p.subjN||0))+' active roles';
+  const _svLbl=document.getElementById('pm-75-lbl');
+  if(_svLbl){const _pool=ROWS.filter(r=>{if(r[16])return false;const st=r[5]||'';if(!['Open','Applied','Applied-Pending','Interviewing'].some(s=>st.startsWith(s)))return false;if((r[6]||0)<=0)return false;if(r[2]==='Cap-Exempt'&&r[7]<50000)return false;if(r[2]==='Cap-Subject'&&r[7]<70000)return false;return true;});_svLbl.textContent='Sponsor-viable ('+_pool.length+' roles)';}
   const zeroP=Math.round((100-p.comb)*10)/10;
   const corrActive=Object.keys(p.notes).length>0;
   document.getElementById('pval-exempt').textContent=p.exempt+'%';
