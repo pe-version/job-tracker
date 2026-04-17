@@ -151,34 +151,22 @@ tr:hover td{background:#2e2d2b}
   var HASH="46ce5fb6e5b64288afc704145b4a877257255eca7579956c42ced02e04c62bc4";var SK="46ce5fb6";
   function hexDigest(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");}
   async function checkPw(pw){var enc=new TextEncoder().encode(pw);var buf=await crypto.subtle.digest("SHA-256",enc);return hexDigest(buf)===HASH;}
-  function showTracker(){
-    var ov=document.getElementById("_pw_overlay");if(ov)ov.remove();
-    var w=document.getElementById("_tracker_wrap");if(w)w.style.display="";
-    setTimeout(function(){if(typeof buildProb==="function")buildProb();},50);
-  }
+  function showTracker(){var ov=document.getElementById("_pw_overlay");if(ov)ov.remove();var w=document.getElementById("_tracker_wrap");if(w)w.style.display="";setTimeout(function(){if(typeof buildProb==="function")buildProb();},50);}
   function buildOverlay(){
     var wrap=document.getElementById("_tracker_wrap");if(wrap)wrap.style.display="none";
-    var ov=document.createElement("div");ov.id="_pw_overlay";
-    ov.style.cssText="position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:system-ui,sans-serif;";
-    var box=document.createElement("div");
-    box.style.cssText="background:#1a1d27;border:1px solid #2d3148;border-radius:12px;padding:2.5rem 2rem;width:320px;text-align:center;";
+    var ov=document.createElement("div");ov.id="_pw_overlay";ov.style.cssText="position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:system-ui,sans-serif;";
+    var box=document.createElement("div");box.style.cssText="background:#1a1d27;border:1px solid #2d3148;border-radius:12px;padding:2.5rem 2rem;width:320px;text-align:center;";
     var icon=document.createElement("div");icon.style.cssText="font-size:2rem;margin-bottom:0.5rem;";icon.textContent="🔒";
     var title=document.createElement("div");title.style.cssText="color:#e2e8f0;font-size:1.1rem;font-weight:500;margin-bottom:0.25rem;";title.textContent="Job Search Tracker";
     var sub=document.createElement("div");sub.style.cssText="color:#94a3b8;font-size:0.8rem;margin-bottom:1.5rem;";sub.textContent="Enter your access password to continue";
-    var inp=document.createElement("input");inp.type="password";inp.placeholder="Password";inp.id="_pw_input";inp.autocomplete="current-password";
-    inp.style.cssText="width:100%;box-sizing:border-box;padding:0.6rem 0.8rem;border-radius:7px;border:1px solid #3d4468;background:#0f1117;color:#e2e8f0;font-size:0.95rem;margin-bottom:0.75rem;outline:none;";
+    var inp=document.createElement("input");inp.type="password";inp.placeholder="Password";inp.id="_pw_input";inp.autocomplete="current-password";inp.style.cssText="width:100%;box-sizing:border-box;padding:0.6rem 0.8rem;border-radius:7px;border:1px solid #3d4468;background:#0f1117;color:#e2e8f0;font-size:0.95rem;margin-bottom:0.75rem;outline:none;";
     var err=document.createElement("div");err.id="_pw_err";err.style.cssText="color:#f87171;font-size:0.8rem;min-height:1.1rem;margin-bottom:0.5rem;";
-    var btn=document.createElement("button");btn.id="_pw_btn";btn.textContent="Unlock";
-    btn.style.cssText="width:100%;padding:0.65rem;border-radius:7px;border:none;background:#4f6ef7;color:#fff;font-size:0.95rem;font-weight:500;cursor:pointer;";
-    box.appendChild(icon);box.appendChild(title);box.appendChild(sub);box.appendChild(inp);box.appendChild(err);box.appendChild(btn);
-    ov.appendChild(box);document.body.prepend(ov);
+    var btn=document.createElement("button");btn.id="_pw_btn";btn.textContent="Unlock";btn.style.cssText="width:100%;padding:0.65rem;border-radius:7px;border:none;background:#4f6ef7;color:#fff;font-size:0.95rem;font-weight:500;cursor:pointer;";
+    box.appendChild(icon);box.appendChild(title);box.appendChild(sub);box.appendChild(inp);box.appendChild(err);box.appendChild(btn);ov.appendChild(box);document.body.prepend(ov);
     async function attempt(){var ok=await checkPw(inp.value);if(ok){sessionStorage.setItem(SK,"1");showTracker();}else{err.textContent="Incorrect password — please try again.";inp.value="";inp.focus();}}
-    btn.addEventListener("click",attempt);
-    inp.addEventListener("keydown",function(e){if(e.key==="Enter")attempt();});
-    inp.focus();
+    btn.addEventListener("click",attempt);inp.addEventListener("keydown",function(e){if(e.key==="Enter")attempt();});inp.focus();
   }
-  if(sessionStorage.getItem(SK)==="1"){document.addEventListener("DOMContentLoaded",showTracker);}
-  else{document.addEventListener("DOMContentLoaded",buildOverlay);}
+  if(sessionStorage.getItem(SK)==="1"){document.addEventListener("DOMContentLoaded",showTracker);}else{document.addEventListener("DOMContentLoaded",buildOverlay);}
 })();
 </script>
 </head>
@@ -431,7 +419,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('csc2',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://careers.hcahealthcare.com/jobs/17533992-financial-analyst-ii" target="_blank">🟠 HealthTrust — Financial Analyst II (Nashville, 1100 MLK Blvd)</a>
-          <span class="cl-deadline dl-open">🟠 UNCERTAIN — Workday-rendered, cannot direct-verify · Sarah Crawford email is the real check <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">🟠 UNCERTAIN — Workday-rendered, cannot direct-verify · Sarah Crawford email is the real check <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa cs">Cap-Subject</span>
           <span class="cl-prob">7%</span>
         </div>
@@ -444,7 +432,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('csc3',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://careers.hcahealthcare.com/jobs/16252982-financial-analyst" target="_blank">🟠 HCA Healthcare — Financial Analyst, Facility Infrastructure (Nashville, hybrid)</a>
-          <span class="cl-deadline dl-open">🟠 UNCERTAIN — Workday-rendered, cannot direct-verify · Sarah Crawford email + apply cold <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">🟠 UNCERTAIN — Workday-rendered, cannot direct-verify · Sarah Crawford email + apply cold <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa cs">Cap-Subject</span>
           <span class="cl-prob">5%</span>
         </div>
@@ -457,7 +445,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('csc4',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://careers.hcahealthcare.com/jobs/15746009-financial-analyst" target="_blank">HCA Healthcare — Financial Analyst, Physician Compensation (Brentwood, hybrid 3d/wk)</a>
-          <span class="cl-deadline dl-open">Open · HCA Physician Services · email Sarah Crawford first <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">Open · HCA Physician Services · email Sarah Crawford first <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa cs">Cap-Subject</span>
           <span class="cl-prob">5%</span>
         </div>
@@ -470,7 +458,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c49',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://vumc.wd1.myworkdayjobs.com/en-US/vumccareers" target="_blank">VUMC Associate Financial Analyst – HR Dept (REMOTE)</a>
-          <span class="cl-deadline dl-open">Open · remote · verify R-number in portal first <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">Open · remote · verify R-number in portal first <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">6%</span>
         </div>
@@ -496,7 +484,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c61',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://recruiting2.ultipro.com/LIP1001LCMB/JobBoard/6e7649f2-aa46-44d5-969d-70429a5423e6" target="_blank">Lipscomb University — Finance & Logistics Coordinator, Lipscomb Missions</a>
-          <span class="cl-deadline dl-open">Open · 30+ days · Suzanne likely knows Missions director — ask in meeting <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">Open · 30+ days · Suzanne likely knows Missions director — ask in meeting <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">5%</span>
         </div>
@@ -535,7 +523,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c62',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="mailto:Phara.C.Williams@tn.gov" target="_blank">TN Dept of Education — Choice Program Fiscal Senior Coordinator — email Phara.C.Williams@tn.gov</a>
-          <span class="cl-deadline dl-open">Open · direct email · hybrid Nashville · cap-exempt <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">Open · direct email · hybrid Nashville · cap-exempt <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">6%</span>
         </div>
@@ -626,7 +614,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c54',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://ecsr.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs/preview/10008132/?keyword=python&mode=location" target="_blank">VU Peabody — Data Analyst, Logan Lab (Job 10008132) · on-site · grant-funded</a>
-          <span class="cl-deadline dl-open">Open · on-site · grant-contingent · apply after other VU roles <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">Open · on-site · grant-contingent · apply after other VU roles <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">4%</span>
         </div>
@@ -653,7 +641,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c51',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://ecsr.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs" target="_blank">VU Sponsored Programs Proposal Specialist (Pre-Award Grants Admin)</a>
-          <span class="cl-deadline dl-open">Open · posted 03/04/2026 · still showing 04/15 · hybrid Nashville <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">Open · posted 03/04/2026 · still showing 04/15 · hybrid Nashville <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">7%</span>
         </div>
@@ -666,7 +654,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c52',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://ecsr.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs" target="_blank">VU Operations Specialist TERM – Credit Union (Finance/Accounting)</a>
-          <span class="cl-deadline dl-open">Open · TERM position · long-running post · safety net only <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">Open · TERM position · long-running post · safety net only <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">4%</span>
         </div>
@@ -679,7 +667,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c36',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://vumc.wd1.myworkdayjobs.com/en-US/vumccareers/details/Associate-Financial-Analyst_R-21030" target="_blank">🟡 VUMC Associate Financial Analyst – IMPH (R-21030, Remote Available)</a>
-          <span class="cl-deadline dl-open">🟡 UPGRADED — TealHQ "29 days ago" = posted ~Mar 19 · still active · IMPH confirmed in listing · apply in VUMC Workday <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">🟡 UPGRADED — TealHQ "29 days ago" = posted ~Mar 19 · still active · IMPH confirmed in listing · apply in VUMC Workday <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">8%</span>
         </div>
@@ -692,7 +680,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c37',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://ecsr.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs" target="_blank">🟡 VU Research Financial Analyst – Research Finance Team</a>
-          <span class="cl-deadline dl-open">🟡 UPGRADED — fresh re-post confirmed 3-4 days ago (Apr 13-14) on multiple aggregators · recurring role · search VU Oracle for "Research Financial Analyst" <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">🟡 UPGRADED — fresh re-post confirmed 3-4 days ago (Apr 13-14) on multiple aggregators · recurring role · search VU Oracle for "Research Financial Analyst" <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">7%</span>
         </div>
@@ -718,7 +706,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c39',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://meharrymedicalcollege.wd12.myworkdayjobs.com/en-US/external/jobs/details/Senior-Grants-Financial-Specialist-Post-Award_JR101143" target="_blank">Meharry Senior Grants Financial Specialist – Post Award (JR101143)</a>
-          <span class="cl-deadline dl-open">Open · posted 3 days ago · multiple openings <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">Open · posted 3 days ago · multiple openings <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">6%</span>
         </div>
@@ -782,7 +770,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('cLucent',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://www.lucenthealth.com/careers" target="_blank">🟡 Lucent Health — Corporate Financial Analyst (Nashville Hybrid)</a>
-          <span class="cl-deadline dl-open">🟡 ZipRecruiter "1 week ago" Apr 17 · Nashville hybrid · cap-subject <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">🟡 ZipRecruiter "1 week ago" Apr 17 · Nashville hybrid · cap-subject <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa cs">Cap-Subject</span>
           <span class="cl-prob">5%</span>
         </div>
@@ -795,7 +783,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('cVUMCcardio',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://vumc.wd1.myworkdayjobs.com/vumccareers" target="_blank">🟠 VUMC — Financial Analyst, Cardiovascular Medicine (Remote Opportunity)</a>
-          <span class="cl-deadline dl-open">🟠 VERIFY — appearing on Indeed as active salary anchor · search VUMC Workday · cap-exempt <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">🟠 VERIFY — appearing on Indeed as active salary anchor · search VUMC Workday · cap-exempt <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa ex">Cap-Exempt</span>
           <span class="cl-prob">7%</span>
         </div>
@@ -808,7 +796,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('cHRT',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="mailto:resumes@healthcarerealty.com" target="_blank">🟡 Healthcare Realty Trust — Senior Financial Analyst ($76K–$104K) — direct email</a>
-          <span class="cl-deadline dl-open">🟡 Active Glassdoor April 2026 · direct email to resumes@healthcarerealty.com · Nashville corporate · cap-subject <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">🟡 Active Glassdoor April 2026 · direct email to resumes@healthcarerealty.com · Nashville corporate · cap-subject <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa cs">Cap-Subject</span>
           <span class="cl-prob">5%</span>
         </div>
@@ -821,7 +809,7 @@ tr:hover td{background:#2e2d2b}
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('cSP1',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
           <a href="https://careers.surgerypartners.com" target="_blank">🟡 Surgery Partners — FP&amp;A Analyst (Brentwood/Nashville hybrid, 3 wks fresh)</a>
-          <span class="cl-deadline dl-open">🟡 Posted ~3 weeks ago · hybrid Mon–Wed Brentwood TN · cap-subject · ⚠️ transit concern <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;">⚠️ VERIFY IN PORTAL</span></span>
+          <span class="cl-deadline dl-open">🟡 Posted ~3 weeks ago · hybrid Mon–Wed Brentwood TN · cap-subject · ⚠️ transit concern <span style="background:#7c3aed;color:#ede9fe;font-size:11px;padding:2px 7px;border-radius:4px;margin-right:6px;font-weight:500;white-space:nowrap;display:inline-block;">⚠️ VERIFY IN PORTAL</span></span>
           <span class="cl-visa cs">Cap-Subject</span>
           <span class="cl-prob">5%</span>
         </div>
