@@ -2109,7 +2109,7 @@ function buildEngProb(){
   const exempt=engaged.filter(r=>r[2]==='Cap-Exempt'||r[2]==='Direct Outreach'||r[2]==='Below $75K');
   const subj=engaged.filter(r=>r[2]==='Cap-Subject');
   const lv=LV[pmLv];
-  function pao(arr,lott){let pn=1.0;arr.forEach(r=>{const p=lott?r[6]*lott[0]/100:r[6]/100;pn*=(1-p);});return[(1-pn)*100,pn];}
+  function pao(arr,lott){let pn=1.0;arr.forEach(r=>{const p=lott?r[6]*lott[0]/10000:r[6]/100;pn*=(1-p);});return[(1-pn)*100,pn];}
   const[pe,pne]=pao(exempt,null);
   const[ps,pns]=pao(subj,lv);  // lottery-per-role for cap-subject
   const pc=(1-pne*pns)*100;
