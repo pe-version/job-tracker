@@ -672,19 +672,6 @@ tr:hover td{background:#2e2d2b}
     </div>
 
     <div class="cl-item">
-      <input type="checkbox" id="c45">
-      <div class="cl-body">
-        <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c45',event)" title="Mark as closed / not in portal" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">✕ dead</button>
-          <a href="https://www.tn.gov/careers" target="_blank">TN Dept of Mental Health – Budget Analyst 2 — ROLE DOES NOT EXIST</a>
-          <span class="cl-deadline dl-open" style="background:#f8d7da;color:#721c24;">Eliminated · role confirmed non-existent</span>
-          <span class="cl-visa ex">Cap-Exempt</span>
-          <span class="cl-prob">5%</span>
-        </div>
-        <div class="cl-meta">TN state government — cap-exempt. Nashville main campus, transit-accessible. Revenue/expenditure forecasts, variance reports. Bachelor’s + 1 yr experience — MBA more than satisfies. Below target pay (~$48-58K) but no lottery risk. Apply via tn.gov/careers.</div>
-      </div>
-    </div>
-
-    <div class="cl-item">
       <input type="checkbox" id="c36">
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c36',event)" title="Mark as closed / not in portal" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">✕ dead</button>
@@ -1388,7 +1375,18 @@ tr:hover td{background:#2e2d2b}
         <div class="cl-meta">Moot — posting pulled from portal April 13. No longer relevant.</div>
       </div>
     </div>
-    </div>
+    
+
+<div class="cl-item" style="opacity:0.4">
+      <input type="checkbox" id="c45" checked>
+      <div class="cl-body">
+        <div class="cl-title" style="text-decoration:line-through">
+          TN Dept of Mental Health – Budget Analyst 2
+          <span class="cl-deadline dl-urgent">❌ ROLE DOES NOT EXIST — confirmed non-existent via TBR/tn.gov portal. Do not apply.</span>
+        </div>
+        <div class="cl-meta">Role confirmed non-existent. Searched TBR careers portal and tn.gov — no active posting. Previously listed based on aggregator signal. Eliminated.</div>
+      </div>
+    </div></div>
   </details>
 
 </div>
@@ -1697,6 +1695,48 @@ tr:hover td{background:#2e2d2b}
 <div class="checklist-section">
   <h2>&#9888; Verification Protocol</h2>
   <p class="cl-sub">Standing rules for all searches and applications. Claude uses these in every session — they are binding instructions, not suggestions.</p>
+
+  <div style="background:#1a1d27;border:1px solid #2d5f2e;border-radius:10px;padding:1.25rem 1.5rem;margin:1rem 0 1.5rem;">
+    <div style="color:#4ade80;font-size:0.75rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.75rem;">
+      ✓ Internal Consistency Rule — Standing Instruction
+    </div>
+    <div style="color:#cbd5e1;font-size:0.82rem;line-height:1.7;">
+
+      <div style="color:#f1f5f9;font-weight:500;margin-bottom:0.35rem;">Core principle</div>
+      <div style="margin-bottom:1rem;">
+        Every item must tell one consistent story. When a role's status changes, ALL of the following must be updated together: the checklist item visual state, the deadline badge, the meta note, the ROWS status field, and the item's position (active tier vs archive). Contradictory signals in a single item are always an error to be corrected immediately.
+      </div>
+
+      <div style="color:#f1f5f9;font-weight:500;margin-bottom:0.35rem;">Signal pairs that must never coexist in the same item</div>
+      <div style="margin-bottom:1rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
+          <span style="color:#f87171;font-weight:500;">Never combine these…</span>
+          <span style="color:#f87171;font-weight:500;">…with these</span>
+          <span>"Confirmed live" / "Posted today" / "Active"</span>
+          <span>"Confirmed closed" / "Not in portal" / "Do not apply" / "False positive"</span>
+          <span>Active color badge (🔴🟡🟠🟢)</span>
+          <span>Line-through text OR opacity:0.4 struck style</span>
+          <span>ROWS status "Open"</span>
+          <span>Item in archive section OR title says "REMOVED/ELIMINATED"</span>
+          <span>ROWS status "Eliminated" or "AVOID"</span>
+          <span>Item in active Tier 1–3 with open-color badge</span>
+          <span>Tier 1 placement</span>
+          <span>⚠️ VERIFY IN PORTAL badge (unverified roles go to Tier 2 minimum)</span>
+          <span>Date/freshness claim (e.g. "3 days ago")</span>
+          <span>Source is aggregator only — must add VERIFY badge</span>
+        </div>
+      </div>
+
+      <div style="color:#f1f5f9;font-weight:500;margin-bottom:0.35rem;">Checklist for every status update</div>
+      <div style="margin-bottom:0.5rem;">
+        When any role is updated (confirmed open, closed, applied, or moved): (1) update the deadline badge text and color class; (2) update the meta note to remove outdated claims; (3) update the ROWS status field; (4) if closing — strike the item, add ❌ badge, move to archive, remove active color badge; (5) if confirming open — remove VERIFY badge, update to confirmed source, move to correct tier if needed.
+      </div>
+
+      <div style="color:#475569;font-size:0.75rem;margin-top:0.75rem;border-top:0.5px solid #2d5f2e;padding-top:0.6rem;">
+        Rule added April 17, 2026 · Applied retroactively — c45 TN Mental Health struck and archived as first application of this rule
+      </div>
+    </div>
+  </div>
 
 
   <div style="background:#0f172a;border:1px solid #1e3a5f;border-radius:10px;padding:1.25rem 1.5rem;margin:1rem 0 1.5rem;font-family:var(--font-sans,system-ui,sans-serif);">
