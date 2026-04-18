@@ -156,7 +156,7 @@ tr:hover td{background:#2e2d2b}
   var HASH="46ce5fb6e5b64288afc704145b4a877257255eca7579956c42ced02e04c62bc4";var SK="46ce5fb6";
   function hexDigest(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");}
   async function checkPw(pw){var enc=new TextEncoder().encode(pw);var buf=await crypto.subtle.digest("SHA-256",enc);return hexDigest(buf)===HASH;}
-  function showTracker(){var ov=document.getElementById("_pw_overlay");if(ov)ov.remove();var w=document.getElementById("_tracker_wrap");if(w)w.style.display="";setTimeout(function(){if(typeof buildProb==="function")buildProb();},50);}
+  function showTracker(){var ov=document.getElementById("_pw_overlay");if(ov)ov.remove();var w=document.getElementById("_tracker_wrap");if(w)w.style.display="";setTimeout(function(){if(typeof render==="function")render();if(typeof buildProb==="function")buildProb();},50);}
   function buildOverlay(){
     var wrap=document.getElementById("_tracker_wrap");if(wrap)wrap.style.display="none";
     var ov=document.createElement("div");ov.id="_pw_overlay";ov.style.cssText="position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:system-ui,sans-serif;";
@@ -177,6 +177,7 @@ tr:hover td{background:#2e2d2b}
 </head>
 <body>
 <div id="_tracker_wrap">
+
 
 <h1>Nashville Job Opportunity Tracker — Ranked by Probability</h1>
 <div class="subtitle">
@@ -417,7 +418,7 @@ tr:hover td{background:#2e2d2b}
       </div>
     </div>
 
-<div class="cl-item t1-green">
+<div class="cl-item done">
       <input type="checkbox" id="cvicc1" checked>
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('cvicc1',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
@@ -814,7 +815,7 @@ tr:hover td{background:#2e2d2b}
       </div>
     </div>
 
-    <div class="cl-item">
+    <div class="cl-item done">
       <input type="checkbox" id="c5" checked>
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c5',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
@@ -827,7 +828,7 @@ tr:hover td{background:#2e2d2b}
       </div>
     </div>
 
-    <div class="cl-item">
+    <div class="cl-item done">
       <input type="checkbox" id="c6" checked>
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c6',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
@@ -840,7 +841,7 @@ tr:hover td{background:#2e2d2b}
       </div>
     </div>
 
-    <div class="cl-item">
+    <div class="cl-item done">
       <input type="checkbox" id="c8" checked>
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c8',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
@@ -930,7 +931,7 @@ tr:hover td{background:#2e2d2b}
       </div>
     </div>
 
-<div class="cl-item">
+<div class="cl-item done">
       <input type="checkbox" id="c27">
       <div class="cl-body">
         <div class="cl-title" style="display:flex;align-items:flex-start;gap:4px;"><button class="_dead_btn" onclick="markDead('c27',event)" title="Click to mark this role as closed, not found in portal, or no longer relevant" style="float:right;margin-left:8px;padding:2px 8px;font-size:11px;background:transparent;border:1px solid #e24b4a44;border-radius:4px;color:#e24b4a;cursor:pointer;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='#e24b4a22'" onmouseout="this.style.background='transparent'">Mark as dead</button>
@@ -2286,7 +2287,8 @@ function switchTab(t){
   document.getElementById('tab-roles').classList.toggle('active',     t==='roles');
   document.getElementById('tab-prob').classList.toggle('active',      t==='prob');
   document.getElementById('tab-protocol').classList.toggle('active',  t==='protocol');
-  if(t==='prob') buildProb();
+  if(t==='prob')  buildProb();
+  if(t==='roles') filter();
 }
 
 // ── Probability tree ──────────────────────────────────────────
@@ -2565,7 +2567,7 @@ function buildProb(){
   const _allLbl=document.getElementById('pm-all-lbl');
   if(_allLbl) _allLbl.textContent='All '+(p.exemptN+(p.subjN||0))+' active roles';
   const _svLbl=document.getElementById('pm-75-lbl');
-  if(_svLbl){const _pool=ROWS.filter(r=>{if(r[16])return false;const st=r[5]||'';if(!['Open','Applied','Applied-Pending','Interviewing'].some(s=>st.startsWith(s)))return false;if((r[6]||0)<=0)return false;if(r[2]==='Cap-Exempt'&&r[7]<50000)return false;if(r[2]==='Cap-Subject'&&r[7]<70000)return false;return true;});_svLbl.textContent='Sponsor-viable ('+_pool.length+' roles)';}
+  if(_svLbl){const _pool=ROWS.filter(r=>{if(r[FIELD.avoid])return false;const st=r[FIELD.status]||'';if(!['Open','Applied','Applied-Pending','Interviewing'].some(s=>st.startsWith(s)))return false;if((r[FIELD.prob]||0)<=0)return false;if(r[FIELD.visa]==='Cap-Exempt'&&r[FIELD.payMid]<50000)return false;if(r[FIELD.visa]==='Cap-Subject'&&r[FIELD.payMid]<70000)return false;return true;});_svLbl.textContent='Sponsor-viable ('+_pool.length+' roles)';}
   const zeroP=Math.round((100-p.comb)*10)/10;
   const corrActive=Object.keys(p.notes).length>0;
   document.getElementById('pval-exempt').textContent=p.exempt+'%';
@@ -2579,8 +2581,8 @@ function buildProb(){
   document.getElementById('pt-win').textContent='Win · '+lv+'%';
   document.getElementById('pt-miss').textContent='Miss · '+(100-lv)+'%';
   const _actSt=['Open','Applied','Applied-Pending','Interviewing'];
-  const _actv=ROWS.filter(r=>{if(r[16])return false;const st=r[5]||'';if(!_actSt.some(s=>st.startsWith(s)))return false;return(r[6]||0)>0;});
-  const _activeSV=_actv.filter(r=>!((r[2]==='Cap-Exempt'&&r[7]<50000)||(r[2]==='Cap-Subject'&&r[7]<70000)));
+  const _actv=ROWS.filter(r=>{if(r[FIELD.avoid])return false;const st=r[FIELD.status]||'';if(!_actSt.some(s=>st.startsWith(s)))return false;return(r[FIELD.prob]||0)>0;});
+  const _activeSV=_actv.filter(r=>!((r[FIELD.visa]==='Cap-Exempt'&&r[FIELD.payMid]<50000)||(r[FIELD.visa]==='Cap-Subject'&&r[FIELD.payMid]<70000)));
   const modeLabel=pmMode==='all'?'all '+_actv.length+' active roles':'sponsor-viable ('+_activeSV.length+' roles)';
   document.getElementById('pt-root').textContent='Apply to '+modeLabel;
   document.getElementById('pt-miss-lbl').textContent='Enter job search';
@@ -2915,6 +2917,7 @@ render(sort(ROWS));
 })();
 </script>
 
+
 </div>
 </body>
-</html>
+</html<div class="cl-item done">
