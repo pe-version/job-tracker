@@ -2835,7 +2835,7 @@ render(sort(ROWS));
     assert(!badRow, 'T5: activeRoles returned non-active row: '+(badRow&&badRow[FIELD.role]));
 
     if (fails.length === 0) {
-      console.log('%c✅ Tracker tests passed — '+active.length+' active roles', 'color:#1d9e75;font-weight:500');
+      console.log('✅ Tracker tests passed — '+active.length+' active roles');
     } else {
       fails.forEach(f => console.warn('❌ FAIL:', f));
     }
