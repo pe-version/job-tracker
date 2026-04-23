@@ -2923,7 +2923,6 @@ render(sort(ROWS));
   }
 
   window.clearChangesLog = function() {
-    if (!confirm("Clear all unsynced changes? Only do this after the tracker has been updated by Claude.")) return;
     localStorage.removeItem(STORE_KEY);
     updateBar();
     showToast("Changes log cleared.");
