@@ -2487,16 +2487,71 @@ function adjustedProb(r,outcomes,mults){
 
 function computeLiveProbs(mode){
   const outcomes=getOutcomes();
-  const lv={
-ctive');
+  const lv={1:.15,2:.30,3:.46,4:.61}[pmLv];
+  const{mults,notes}=buildGroupMultipliers(outcomes);
+  const RHO=0.6;
+
+  const hasOffer=ROWS.some(r=>{
+    if(r[FIELD.avoid])return false;
+    return(outcomes[makeKey(r)]||'')==='offer';
+  });
+  if(hasOffer)return{offerIn:true};
+
+  const active=activeRoles(mode).filter(r=>(outcomes[makeKey(r)]||'')!=='rejected');
+
+  const byEmp={};
+  active.forEach(r=>{
+    const emp=r[FIELD.employer]||'Unknown';
+    if(!byEmp[emp])byEmp[emp]=[];
+    byEmp[emp].push(r);
+  });
+
+  function effProb(r){
+    const base=adjustedProb(r,outcomes,mults);
+    if(r[FIELD.visa]==='Cap-Subject'){
+      const roleLv=r[FIELD.lotteryLevel]||pmLv;
+      const scenLv=pmLv!==3?pmLv:roleLv;
+      const lvPct={1:.15,2:.30,3:.46,4:.61}[scenLv]||lv;
+      return base*lvPct/100;
+    }
+    return base/100;
+  }
+
+  let pNone=1;
+  const empBreakdown=[];
+  Object.entries(byEmp).forEach(([emp,roles])=>{
+    const probs=roles.map(r=>effProb(r));
+    const pMax=Math.max(...probs);
+    const pIndep=1-probs.reduce((acc,p)=>acc*(1-p),1);
+    const pEmp=RHO*pMax+(1-RHO)*pIndep;
+    pNone*=(1-pEmp);
+    empBreakdown.push({emp,n:roles.length,pEmp:Math.round(pEmp*1000)/10});
+  });
+
+  const comb=Math.round((1-pNone)*1000)/10;
+  const rej=Object.values(outcomes).filter(v=>v==='rejected').length;
+  const iview=Object.values(outcomes).filter(v=>v==='interviewing').length;
+  const app=Object.values(outcomes).filter(v=>v==='applied').length;
+  return{
+    comb,activeN:active.length,empN:Object.keys(byEmp).length,
+    empBreakdown:empBreakdown.sort((a,b)=>b.pEmp-a.pEmp),
+    rej,iview,app,notes,offerIn:false
+  };
+}
+
+function renderCorrActive(notes){
+  const el=document.getElementById('corr-active');
   const rows=document.getElementById('corr-active-rows');
-  const entries=Object.entries(notes);
+  if(!el||!rows)return;
+  const entries=Object.entries(notes||{});
   if(!entries.length){el.style.display='none';return;}
   el.style.display='';
-  rows.innerHTML=entries.map(([g,{m,rejCount,intCount,parts}])=>{
+  rows.innerHTML=entries.map(([g,info])=>{
+    const m=info&&info.m!=null?info.m:1;
+    const parts=info&&info.parts||[];
     const dir=m<1?'<span style="color:#c0392b">▼ ×'+m.toFixed(2)+'</span>':m>1?'<span style="color:#0a5c3a">▲ ×'+m.toFixed(2)+'</span>':'×1.00';
     const detail=parts.map(p=>'<span style="background:#f4f3f0;border-radius:3px;padding:1px 5px;margin-right:4px">'+p+'</span>').join('');
-    return `<div style="margin-bottom:4px"><strong>${g}</strong> ${dir} &nbsp;${detail}</div>`;
+    return '<div style="margin-bottom:4px"><strong>'+g+'</strong> '+dir+' &nbsp;'+detail+'</div>';
   }).join('');
 }
 
@@ -2807,7 +2862,15 @@ render(sort(ROWS));
     const tp=computeLiveProbs('all');
     assert(!tp.offerIn,'T8: offerIn should be false in test context');
     assert(tp.comb>0&&tp.comb<=100,'T8: comb probability out of range: '+tp.comb);
-  } catch(e)();
+  } catch(e) {
+    console.warn('Tracker test error:', e.message||e);
+  }
+  if(fails.length===0){
+    console.log('✅ Tracker tests passed');
+  } else {
+    fails.forEach(f=>console.warn('❌ FAIL:', f));
+  }
+})();
 </script>
 
 
