@@ -2864,11 +2864,11 @@ render(sort(ROWS));
     assert(FIELD.prob   === 6, 'T4: FIELD.prob should be 6, got '+FIELD.prob);
     assert(FIELD.avoid  === 16,'T4: FIELD.avoid should be 16, got '+FIELD.avoid);
 
-    // Test 5: activeRoles only returns Open/Applied with prob>0
+    // Test 5: activeRoles only returns Open/Applied/Screening with prob>0
     const active = activeRoles('all');
     const badRow = active.find(r => {
       const st = r[FIELD.status]||'';
-      return !['Open','Applied','Applied-Pending','Interviewing'].some(s=>st.startsWith(s));
+      return !['Open','Applied','Applied-Pending','Interviewing','Screening'].some(s=>st.startsWith(s));
     });
     assert(!badRow, 'T5: activeRoles returned non-active row: '+(badRow&&badRow[FIELD.role]));
 
