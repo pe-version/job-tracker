@@ -2476,29 +2476,46 @@ function renderCorrActive(notes){
 function buildProb(){
   const p=computeLiveProbs(pmMode);
   if(p.offerIn){
-  
-}[pmLv]||.46;
-  const exFlt=r=>['Cap-Exempt','Direct Outreach','Below $75K'].includes(r[FIELD.visa]);
-  const p1ex=arr=>(1-arr.filter(exFlt).reduce((p,r)=>p*(1-r[FIELD.prob]/100),1))*100;
-  const p1comb=arr=>{
-    const pne=arr.filter(exFlt).reduce((p,r)=>p*(1-r[FIELD.prob]/100),1);
-    const pns=arr.filter(r=>r[FIELD.visa]==='Cap-Subject').reduce((p,r)=>p*(1-(r[FIELD.prob]*lv)/100),1);
-    return(1-pne*pns)*100;
-  };
-  const fmt=v=>v.toFixed(1)+'%';
-  const sgn=d=>(d>=0?'+':'')+d.toFixed(1)+' pp';
-  const allPe=p1ex(allPool),svPe=p1ex(svPool);
-  const allPc=p1comb(allPool),svPc=p1comb(svPool);
-  const allOv=(lv+(1-lv)*(allPc/100))*100,svOv=(lv+(1-lv)*(svPc/100))*100;
+    document.getElementById('pval-comb').textContent='100%';
+    document.getElementById('psub-comb').textContent='Offer received — done!';
+    ['pval-exempt','pval-subj','pval-ovr'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
+    ['psub-exempt','psub-subj','psub-ovr'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='';});
+    const ca=document.getElementById('corr-active');if(ca)ca.style.display='none';
+    return;
+  }
+  renderCorrActive(p.notes);
+  const zeroP=Math.round((100-p.comb)*10)/10;
+  document.getElementById('pval-comb').textContent=p.comb+'%';
+  document.getElementById('psub-comb').textContent='P(zero offers) = '+zeroP+'%'+(p.rej?' · '+p.rej+' rejected':'')+(p.iview?' · '+p.iview+' interviewing':'');
+  const top=p.empBreakdown.slice(0,2);
+  if(top[0]){document.getElementById('pval-exempt').textContent=top[0].pEmp+'%';document.getElementById('psub-exempt').textContent=top[0].emp+(top[0].n>1?' ('+top[0].n+' roles)':'');}
+  if(top[1]){document.getElementById('pval-subj').textContent=top[1].pEmp+'%';document.getElementById('psub-subj').textContent=top[1].emp+(top[1].n>1?' ('+top[1].n+' roles)':'');}
+  document.getElementById('pval-ovr').textContent=p.comb+'%';
+  document.getElementById('psub-ovr').textContent=p.activeN+' active roles across '+p.empN+' employers · ρ=0.60';
+  const lbl0=document.getElementById('plbl-exempt');if(lbl0&&top[0])lbl0.textContent=top[0].emp+' P(≥1)';
+  const ids2=['pt-root','pt-pexempt','pt-exempt-sub','pt-comb','pt-zero','pt-miss-lbl','pt-miss-sub'];
+  ids2.forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    if(id==='pt-root')el.textContent='Correlated model · '+p.activeN+' roles · '+p.empN+' employers';
+    else if(id==='pt-pexempt')el.textContent=p.comb+'%';
+    else if(id==='pt-exempt-sub')el.textContent='P(≥1 offer)';
+    else if(id==='pt-comb')el.textContent='P(≥1 offer) = '+p.comb+'% [ρ=0.60]';
+    else if(id==='pt-zero')el.textContent='P(no offer) = '+zeroP+'%';
+    else if(id==='pt-miss-lbl')el.textContent='Enter job search';
+    else if(id==='pt-miss-sub')el.textContent=p.activeN+' active roles · '+p.empN+' employers';
+  });
+  const d=document.getElementById('pt-delta');if(d)d.style.opacity='0';
+  const al=document.getElementById('pm-all-lbl');if(al)al.textContent='All '+p.activeN+' active roles';
+}
+
+function updateCompare(allPool,svPool){
+  if(!allPool||!svPool)return;
   const excl=allPool.length-svPool.length;
-  const t=document.getElementById('pc-title');
-  if(t)t.textContent='Impact of $75K floor: '+allPool.length+' roles \u2192 '+svPool.length+' sponsor-viable';
+  const t=document.getElementById('pc-title');if(t)t.textContent='Sponsor-viable: '+svPool.length+' / '+allPool.length+' roles';
   const s=(id,v,sub)=>{const ve=document.getElementById(id);if(ve)ve.textContent=v;const se=document.getElementById(id+'-sub');if(se)se.textContent=sub;};
   s('cc-roles',svPool.length+' / '+allPool.length,excl+' role'+(excl===1?'':'s')+' excluded by $75K floor');
-  s('cc-exempt',fmt(svPe),sgn(svPe-allPe)+' vs full pipeline');
-  s('cc-comb',fmt(svPc),sgn(svPc-allPc)+' vs full pipeline');
-  s('cc-ovr',fmt(svOv),sgn(svOv-allOv)+' vs full pipeline');
-};
+}
+
 
 render(sort(ROWS));
 
