@@ -1,38 +1,4 @@
-<!DOC
-<div style="margin-top:18px;padding:14px 16px;background:#f8f5e6;border:1px solid #e8d87f;border-radius:8px;">
-  <div style="font-weight:700;font-size:13px;color:#7a5c00;margin-bottom:10px;">📐 Probability Calibration Methodology (Apr 24, 2026)</div>
-  <div style="font-size:12px;line-height:1.8;color:#444;">
-
-  <strong>Individual role base rates:</strong><br>
-  <table style="width:100%;border-collapse:collapse;font-size:11.5px;margin:6px 0 10px 0;">
-    <tr style="background:#f0e9c8"><th style="text-align:left;padding:3px 8px">Scenario</th><th style="text-align:center;padding:3px 8px">Rate</th></tr>
-    <tr><td style="padding:3px 8px">Fresh posting, strong JD fit, cap-exempt institution, not yet applied</td><td style="text-align:center;padding:3px 8px">5–7%</td></tr>
-    <tr style="background:#faf7ee"><td style="padding:3px 8px">Applied, strong fit, cap-exempt, no response yet (within window)</td><td style="text-align:center;padding:3px 8px">4–6%</td></tr>
-    <tr><td style="padding:3px 8px">Active interview (internal referral, warm path)</td><td style="text-align:center;padding:3px 8px">10–13%</td></tr>
-    <tr style="background:#faf7ee"><td style="padding:3px 8px">Screening pass (government / state agency)</td><td style="text-align:center;padding:3px 8px">6–8%</td></tr>
-    <tr><td style="padding:3px 8px">Language / adjunct / niche role (small employer, irregular hiring)</td><td style="text-align:center;padding:3px 8px">3–6%</td></tr>
-    <tr style="background:#faf7ee"><td style="padding:3px 8px">Cap-subject, no interview signal, needs H-1B lottery</td><td style="text-align:center;padding:3px 8px">2–4%</td></tr>
-    <tr><td style="padding:3px 8px">Applied 15–30 days, no response</td><td style="text-align:center;padding:3px 8px">−20% from base</td></tr>
-    <tr style="background:#faf7ee"><td style="padding:3px 8px">Applied 30+ days, no response</td><td style="text-align:center;padding:3px 8px">−40% from base</td></tr>
-    <tr><td style="padding:3px 8px">Talent community only (no active posting)</td><td style="text-align:center;padding:3px 8px">1–2%</td></tr>
-  </table>
-
-  <strong>Employer cluster discount:</strong> When 2+ active applications exist at the same employer, individual role probabilities are reduced — they share hiring budget, HR bandwidth, and interview pipeline.<br>
-  <table style="width:60%;border-collapse:collapse;font-size:11.5px;margin:6px 0 10px 0;">
-    <tr style="background:#f0e9c8"><th style="text-align:left;padding:3px 8px">Active apps at employer</th><th style="text-align:center;padding:3px 8px">Per-role multiplier</th></tr>
-    <tr><td style="padding:3px 8px">1</td><td style="text-align:center">×1.0 (no discount)</td></tr>
-    <tr style="background:#faf7ee"><td style="padding:3px 8px">2–3</td><td style="text-align:center">×0.7</td></tr>
-    <tr><td style="padding:3px 8px">4–6</td><td style="text-align:center">×0.5</td></tr>
-    <tr style="background:#faf7ee"><td style="padding:3px 8px">7+</td><td style="text-align:center">×0.4</td></tr>
-  </table>
-
-  <strong>Combined P(≥1) — honest interpretation:</strong><br>
-  The tracker's combined percentage assumes all roles are statistically independent. They are not — applications at the same employer are correlated, and market-wide conditions (hiring freezes, academic cycle slowdowns) affect multiple employers simultaneously.<br><br>
-  <strong>Correction:</strong> Subtract 15–20 percentage points from the reported combined figure to get a realistic estimate. If the tracker shows 75%, the realistic P(≥1 offer) is approximately <strong>55–60%</strong>.<br><br>
-  The combined figure is most useful for <em>relative</em> tracking — seeing how the pipeline grows or shrinks over time — not as an absolute probability.
-
-  </div>
-</div>TYPE html>
+<!DOCTYPE html>
 <html lang="en" style="color-scheme:light dark">
 <head>
 <meta charset="UTF-8">
@@ -1709,6 +1675,36 @@ a:hover{text-decoration:underline}
 <div class="checklist-section">
   <h2>&#9888; Verification Protocol</h2>
   <p class="cl-sub">Standing rules for all searches and applications. Claude uses these in every session — they are binding instructions, not suggestions.</p>
+<div style="margin-top:18px;padding:14px 16px;background:#f8f5e6;border:1px solid #e8d87f;border-radius:8px;">
+  <div style="font-weight:700;font-size:13px;color:#7a5c00;margin-bottom:10px;">📐 Probability Calibration Methodology (Apr 24, 2026)</div>
+  <div style="font-size:12px;line-height:1.8;color:#444;">
+
+  <strong>Individual role base rates:</strong>
+  <table style="width:100%;border-collapse:collapse;font-size:11.5px;margin:6px 0 10px 0;">
+    <tr style="background:#f0e9c8"><th style="text-align:left;padding:3px 8px">Scenario</th><th style="text-align:center;padding:3px 8px;width:80px">Rate</th></tr>
+    <tr><td style="padding:3px 8px">Fresh posting, strong JD fit, cap-exempt, not yet applied</td><td style="text-align:center;padding:3px 8px">5–7%</td></tr>
+    <tr style="background:#faf7ee"><td style="padding:3px 8px">Applied, strong fit, cap-exempt, within response window</td><td style="text-align:center;padding:3px 8px">4–6%</td></tr>
+    <tr><td style="padding:3px 8px">Active interview (internal referral)</td><td style="text-align:center;padding:3px 8px">10–13%</td></tr>
+    <tr style="background:#faf7ee"><td style="padding:3px 8px">Screening pass (government / state agency)</td><td style="text-align:center;padding:3px 8px">6–8%</td></tr>
+    <tr><td style="padding:3px 8px">Language / adjunct / niche (small employer, irregular hiring)</td><td style="text-align:center;padding:3px 8px">3–6%</td></tr>
+    <tr style="background:#faf7ee"><td style="padding:3px 8px">Cap-subject, no interview signal</td><td style="text-align:center;padding:3px 8px">2–4%</td></tr>
+    <tr><td style="padding:3px 8px">Applied 15–30 days, no response</td><td style="text-align:center;padding:3px 8px">−20% from base</td></tr>
+    <tr style="background:#faf7ee"><td style="padding:3px 8px">Applied 30+ days, no response</td><td style="text-align:center;padding:3px 8px">−40% from base</td></tr>
+    <tr><td style="padding:3px 8px">Talent community only (no active posting)</td><td style="text-align:center;padding:3px 8px">1–2%</td></tr>
+  </table>
+
+  <strong>Employer cluster discount</strong> — roles at the same employer share hiring budget, HR bandwidth, and interview pipeline:
+  <table style="width:55%;border-collapse:collapse;font-size:11.5px;margin:6px 0 10px 0;">
+    <tr style="background:#f0e9c8"><th style="text-align:left;padding:3px 8px">Active apps at employer</th><th style="text-align:center;padding:3px 8px">Per-role multiplier</th></tr>
+    <tr><td style="padding:3px 8px">1</td><td style="text-align:center;padding:3px 8px">×1.0</td></tr>
+    <tr style="background:#faf7ee"><td style="padding:3px 8px">2–3</td><td style="text-align:center;padding:3px 8px">×0.7</td></tr>
+    <tr><td style="padding:3px 8px">4–6</td><td style="text-align:center;padding:3px 8px">×0.5</td></tr>
+    <tr style="background:#faf7ee"><td style="padding:3px 8px">7+</td><td style="text-align:center;padding:3px 8px">×0.4</td></tr>
+  </table>
+
+  <strong>Reading the combined P(≥1):</strong> The tracker's formula assumes all roles are independent — they are not. Apply a <strong>15–20pp downward correction</strong> to the reported figure. If the tracker shows 74%, the realistic estimate is approximately <strong>55–60%</strong>. Use the combined number for relative tracking (pipeline growing or shrinking), not as an absolute probability.
+  </div>
+</div>
 
   <div style="background:#1a1d27;border:1px solid #2d5f2e;border-radius:10px;padding:1.25rem 1.5rem;margin:1rem 0 1.5rem;">
     <div style="color:#4ade80;font-size:0.75rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.75rem;">
