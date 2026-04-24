@@ -1500,31 +1500,29 @@ a:hover{text-decoration:underline}
 
 <div class="prob-metrics">
   <div class="prob-metric">
-    <div class="pm-lbl" id="plbl-exempt">Cap-exempt P(≥1 offer)</div>
+    <div class="pm-lbl" id="plbl-exempt">Top employer</div>
     <div class="pm-val" id="pval-exempt">—</div>
     <div class="pm-sub" id="psub-exempt">calculating…</div>
   </div>
   <div class="prob-metric">
-    <div class="pm-lbl">Cap-subject P(≥1+visa)</div>
+    <div class="pm-lbl">2nd employer</div>
     <div class="pm-val" id="pval-subj">—</div>
     <div class="pm-sub" id="psub-subj">calculating…</div>
   </div>
   <div class="prob-metric">
-    <div class="pm-lbl">P(≥1 offer) from search</div>
+    <div class="pm-lbl">P(≥1 offer) — correlated</div>
     <div class="pm-val good" id="pval-comb">—</div>
     <div class="pm-sub" id="psub-comb">calculating…</div>
   </div>
   <div class="prob-metric">
-    <div class="pm-lbl">P(≥1 offer, any employer)</div>
+    <div class="pm-lbl">Active roles / employers</div>
     <div class="pm-val good" id="pval-ovr">—</div>
     <div class="pm-sub" id="psub-ovr">calculating…</div>
   </div>
 </div>
 
-<div style="background:#fffbf0;border:1px solid #e8d87a;border-radius:6px;padding:8px 14px;margin-bottom:10px;font-size:11.5px;color:#5a4a00;line-height:1.6">
-  <strong>Model assumptions:</strong> Each role's probability is P(offer | application submitted), estimated from JD fit, experience match, and employer H-1B history.
-  Roles are treated as <em>independent</em> — in reality, common failure modes (experience gaps, hiring freezes, competition) are correlated, so the true combined probability is likely <strong>10–20 pp lower</strong> than shown.
-  The per-role numbers are point estimates, not confidence intervals. Use the Applied/Engaged tab for a realistic floor.
+<div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:6px;padding:8px 14px;margin-bottom:10px;font-size:11.5px;color:#1b5e20;line-height:1.6">
+  <strong>Correlated employer model (ρ=0.60):</strong> Roles at the same employer share hiring budget, HR pipeline, and hiring environment. Within each employer, P(≥1 offer) = 0.60×p<sub>max</sub> + 0.40×P(independent). Employers are then treated as independent of each other. Cap-subject roles are discounted by H-1B lottery probability at the role level before grouping. <strong>This is the single realistic estimate</strong> — no further correction needed.
 </div>
 <svg width="100%" viewBox="0 0 680 614" style="display:block">
 <defs><marker id="par" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
@@ -1751,7 +1749,7 @@ a:hover{text-decoration:underline}
     <tr style="background:#faf7ee"><td style="padding:3px 8px">7+</td><td style="text-align:center;padding:3px 8px">×0.4</td></tr>
   </table>
 
-  <strong>Reading the combined P(≥1):</strong> The tracker's formula assumes all roles are independent — they are not. Apply a <strong>15–20pp downward correction</strong> to the reported figure. If the tracker shows 74%, the realistic estimate is approximately <strong>55–60%</strong>. Use the combined number for relative tracking (pipeline growing or shrinking), not as an absolute probability.
+  <strong>Reading the combined P(≥1):</strong> The tracker uses a correlated employer model (ρ=0.60). Within each employer, P(≥1) = 0.60×p<sub>max</sub> + 0.40×P(independent). Employers are treated as independent of each other. Apply a <strong>15–20pp downward correction</strong> to the reported figure. If the tracker shows 74%, the realistic estimate is approximately <strong>55–60%</strong>. Use the combined number for relative tracking (pipeline growing or shrinking), not as an absolute probability.
   </div>
 </div>
 
@@ -2523,57 +2521,66 @@ function activeRoles(mode) {
 
 function computeLiveProbs(mode){
   const outcomes=getOutcomes();
+  const lv={function computeLiveProbs(mode){
+  const outcomes=getOutcomes();
   const lv={1:.15,2:.30,3:.46,4:.61}[pmLv];
   const{mults,notes}=buildGroupMultipliers(outcomes);
+  const RHO=0.6; // intra-employer correlation (0=independent, 1=fully correlated)
 
-  // Check offer first
   const hasOffer=ROWS.some(r=>{
     if(r[FIELD.avoid])return false;
     return(outcomes[makeKey(r)]||'')==='offer';
   });
   if(hasOffer)return{offerIn:true};
 
-  // Use shared activeRoles() utility — single source of truth for active filter
-  const active = activeRoles(mode).filter(r => (outcomes[makeKey(r)]||'') !== 'rejected');
+  const active=activeRoles(mode).filter(r=>(outcomes[makeKey(r)]||'')!=='rejected');
 
-  const exempt=active.filter(r=>r[FIELD.visa]==='Cap-Exempt'||r[FIELD.visa]==='Direct Outreach'||(mode==='all'&&r[FIELD.visa]==='Below $75K'));
-  const subj=active.filter(r=>r[FIELD.visa]==='Cap-Subject');
-
-  let pne=1;
-  exempt.forEach(r=>{const p=adjustedProb(r,outcomes,mults);pne*=(1-p/100);});
-  let pns=1;
-  // Per-role lottery level: use r[FIELD.lotteryLevel] if set, else fall back to global pmLv
-  // L-buttons act as a scenario override when pmLv differs from role's native level
-  subj.forEach(r=>{
-    const roleLv=r[FIELD.lotteryLevel]||pmLv;
-    const scenarioLv=pmLv!==3?pmLv:roleLv; // if user has changed from default, apply override
-    const lvPct={1:.15,2:.30,3:.46,4:.61}[scenarioLv]||lv;
-    const p=adjustedProb(r,outcomes,mults);
-    pns*=(1-(p*lvPct)/100);
+  // Group by employer
+  const byEmp={};
+  active.forEach(r=>{
+    const emp=r[FIELD.employer]||'Unknown';
+    if(!byEmp[emp])byEmp[emp]=[];
+    byEmp[emp].push(r);
   });
 
-  const comb=(1-pne*pns)*100;
-  // P(≥1 offer, any employer) = P(current employer lottery) + P(miss lottery) × P(>=1 offer from search)
-  // P(≥1 offer, any employer) = P(≥1 offer from search) only.
-  // The original formula added a current-employer lottery term (lv), but current employer
-  // (HCA) has a hiring freeze and is not actively sponsoring — that term is excluded.
-  const ovr=comb;
+  // Effective per-role probability (includes lottery discount for cap-subject)
+  function effProb(r){
+    const base=adjustedProb(r,outcomes,mults);
+    if(r[FIELD.visa]==='Cap-Subject'){
+      const roleLv=r[FIELD.lotteryLevel]||pmLv;
+      const scenLv=pmLv!==3?pmLv:roleLv;
+      const lvPct={1:.15,2:.30,3:.46,4:.61}[scenLv]||lv;
+      return base*lvPct/100;
+    }
+    return base/100;
+  }
+
+  // Per-employer P(>=1 offer): mixture model
+  // P(emp) = RHO * p_max + (1-RHO) * (1 - prod(1-pi))
+  let pNone=1;
+  const empBreakdown=[];
+  Object.entries(byEmp).forEach(([emp,roles])=>{
+    const probs=roles.map(r=>effProb(r));
+    const pMax=Math.max(...probs);
+    const pIndep=1-probs.reduce((acc,p)=>acc*(1-p),1);
+    const pEmp=RHO*pMax+(1-RHO)*pIndep;
+    pNone*=(1-pEmp);
+    empBreakdown.push({emp,n:roles.length,pEmp:Math.round(pEmp*1000)/10});
+  });
+
+  const comb=Math.round((1-pNone)*1000)/10;
   const rej=Object.values(outcomes).filter(v=>v==='rejected').length;
   const iview=Object.values(outcomes).filter(v=>v==='interviewing').length;
   const app=Object.values(outcomes).filter(v=>v==='applied').length;
   return{
-    exempt:Math.round((1-pne)*1000)/10,
-    exemptN:exempt.length,
-    subj:Math.round((1-pns)*1000)/10,
-    subjN:subj.length,
-    comb:Math.round(comb*10)/10,
-    ovr:Math.round(ovr*10)/10,
+    comb,
+    activeN:active.length,
+    empN:Object.keys(byEmp).length,
+    empBreakdown:empBreakdown.sort((a,b)=>b.pEmp-a.pEmp),
     rej,iview,app,notes,offerIn:false
   };
 }
-
-function renderCorrActive(notes){
-  const el=document.getElementById('corr-active');
+ctive');
   const rows=document.getElementById('corr-active-rows');
   const entries=Object.entries(notes);
   if(!entries.length){el.style.display='none';return;}
@@ -2589,57 +2596,62 @@ function renderCorrActive(notes){
 function buildProb(){
   const p=computeLiveProbs(pmMode);
   if(p.offerIn){
-    ['pval-exempt','pval-subj'].forEach(id=>document.getElementById(id).textContent='—');
-    document.getElementById('psub-exempt').textContent='Offer in hand';
-    document.getElementById('psub-subj').textContent='';
+  function buildProb(){
+  const p=computeLiveProbs(pmMode);
+  if(p.offerIn){
     document.getElementById('pval-comb').textContent='100%';
-    document.getElementById('psub-comb').textContent='Offer received';
+    document.getElementById('psub-comb').textContent='Offer received — done!';
+    document.getElementById('pval-exempt').textContent='—';
+    document.getElementById('psub-exempt').textContent='';
+    document.getElementById('pval-subj').textContent='—';
+    document.getElementById('psub-subj').textContent='';
     document.getElementById('pval-ovr').textContent='100%';
-    document.getElementById('psub-ovr').textContent='Done!';
-    document.getElementById('pt-comb').textContent='Offer secured — done!';
-    document.getElementById('pt-zero').textContent='';
+    document.getElementById('psub-ovr').textContent='';
     document.getElementById('corr-active').style.display='none';
     return;
   }
   renderCorrActive(p.notes);
-  const lv={1:15,2:30,3:46,4:61}[pmLv];
-  // Update button labels with live counts
-  const _allLbl=document.getElementById('pm-all-lbl');
-  if(_allLbl) _allLbl.textContent='All '+(p.exemptN+(p.subjN||0))+' active roles';
-  const _svLbl=document.getElementById('pm-75-lbl');
-  if(_svLbl){const _pool=ROWS.filter(r=>{if(r[FIELD.avoid])return false;const st=r[FIELD.status]||'';if(!['Open','Applied','Applied-Pending','Interviewing'].some(s=>st.startsWith(s)))return false;if((r[FIELD.prob]||0)<=0)return false;if(r[FIELD.visa]==='Cap-Exempt'&&r[FIELD.payMid]<50000)return false;if(r[FIELD.visa]==='Cap-Subject'&&r[FIELD.payMid]<70000)return false;return true;});_svLbl.textContent='Sponsor-viable ('+_pool.length+' roles)';}
   const zeroP=Math.round((100-p.comb)*10)/10;
-  const corrActive=Object.keys(p.notes).length>0;
-  document.getElementById('pval-exempt').textContent=p.exempt+'%';
-  document.getElementById('psub-exempt').textContent=p.exemptN+' active roles'+(corrActive?' (corr. adj.)':'');
-  document.getElementById('pval-subj').textContent=p.subj+'%';
-  document.getElementById('psub-subj').textContent=p.subjN+' cap-subject · per-role L1–L4'+(pmLv!==3?' (scenario: L'+pmLv+' override)':'');
-  document.getElementById('pval-comb').textContent=p.comb+'%';
-  document.getElementById('psub-comb').textContent='P(zero) = '+zeroP+'%'+(p.rej?' · '+p.rej+' rejected':'')+(p.iview?' · '+p.iview+' interviewing':'')+(p.app?' · '+p.app+' applied':'');
-  document.getElementById('pval-ovr').textContent=p.ovr+'%';
-  document.getElementById('psub-ovr').textContent='per-role lottery + cap-exempt search'+(pmLv!==3?' · L'+pmLv+' scenario':'');
-  document.getElementById('pt-win').textContent='Win · '+lv+'%';
-  document.getElementById('pt-miss').textContent='Miss · '+(100-lv)+'%';
-  const _actSt=['Open','Applied','Applied-Pending','Interviewing'];
-  const _actv=ROWS.filter(r=>{if(r[FIELD.avoid])return false;const st=r[FIELD.status]||'';if(!_actSt.some(s=>st.startsWith(s)))return false;return(r[FIELD.prob]||0)>0;});
-  const _activeSV=_actv.filter(r=>!((r[FIELD.visa]==='Cap-Exempt'&&r[FIELD.payMid]<50000)||(r[FIELD.visa]==='Cap-Subject'&&r[FIELD.payMid]<70000)));
-  const modeLabel=pmMode==='all'?'all '+_actv.length+' active roles':'sponsor-viable ('+_activeSV.length+' roles)';
-  document.getElementById('pt-root').textContent='Apply to '+modeLabel;
-  document.getElementById('pt-miss-lbl').textContent='Enter job search';
-  document.getElementById('pt-miss-sub').textContent=(p.exemptN+p.subjN)+' active roles'+(p.rej?' ('+p.rej+' rejected)':'');
-  document.getElementById('pt-pexempt').textContent=p.exempt+'%';
-  document.getElementById('pt-exempt-sub').textContent=p.exemptN+' cap-exempt';
-  document.getElementById('pt-psubj').textContent=p.subj+'%';
-  document.getElementById('pt-subj-sub').textContent=p.subjN+' cap-subject';
-  document.getElementById('pt-comb').textContent='Combined P(≥1) = '+p.comb+'%';
-  document.getElementById('pt-zero').textContent='P(no offer via either path) = '+zeroP+'%';
-  document.getElementById('pt-delta').style.opacity=(pmMode==='s75')?'1':'0';
-  // Update $75K comparison panel
-  if(typeof _actv!=='undefined')updateCompare(_actv,_activeSV);
-}
 
-function updateCompare(allPool,svPool){
-  const lv={1:.15,2:.30,3:.46,4:.61}[pmLv]||.46;
+  // Primary metric
+  document.getElementById('pval-comb').textContent=p.comb+'%';
+  document.getElementById('psub-comb').textContent='P(zero offers) = '+zeroP+'%'+(p.rej?' · '+p.rej+' rejected':'')+(p.iview?' · '+p.iview+' interviewing':'');
+
+  // Repurpose exempt/subj panels to show employer breakdown
+  const top=p.empBreakdown.slice(0,2);
+  if(top[0]){
+    document.getElementById('pval-exempt').textContent=top[0].pEmp+'%';
+    document.getElementById('psub-exempt').textContent=top[0].emp+(top[0].n>1?' ('+top[0].n+' roles)':'');
+  }
+  if(top[1]){
+    document.getElementById('pval-subj').textContent=top[1].pEmp+'%';
+    document.getElementById('psub-subj').textContent=top[1].emp+(top[1].n>1?' ('+top[1].n+' roles)':'');
+  }
+
+  // Overview panel: show active/employer counts
+  document.getElementById('pval-ovr').textContent=p.comb+'%';
+  document.getElementById('psub-ovr').textContent=p.activeN+' active roles across '+p.empN+' employers · ρ=0.60';
+
+  // Update labels on the 4 panels
+  const lbl0=document.getElementById('plbl-exempt');
+  const lbl1=document.querySelector('[id="pval-subj"]')?.previousElementSibling;
+  if(lbl0) lbl0.textContent=(top[0]?top[0].emp+' P(≥1)':'Top employer');
+
+  // Update prob tree panel labels
+  document.getElementById('pt-root')&&(document.getElementById('pt-root').textContent='Correlated model · '+p.activeN+' roles · '+p.empN+' employers');
+  document.getElementById('pt-pexempt')&&(document.getElementById('pt-pexempt').textContent=p.comb+'%');
+  document.getElementById('pt-exempt-sub')&&(document.getElementById('pt-exempt-sub').textContent='P(≥1 offer)');
+  document.getElementById('pt-comb')&&(document.getElementById('pt-comb').textContent='P(≥1 offer) = '+p.comb+'%  [ρ=0.60 within employer]');
+  document.getElementById('pt-zero')&&(document.getElementById('pt-zero').textContent='P(no offer) = '+zeroP+'%');
+  document.getElementById('pt-miss-lbl')&&(document.getElementById('pt-miss-lbl').textContent='Enter job search');
+  document.getElementById('pt-miss-sub')&&(document.getElementById('pt-miss-sub').textContent=p.activeN+' active roles · '+p.empN+' employers');
+  document.getElementById('pt-delta')&&(document.getElementById('pt-delta').style.opacity='0');
+
+  // Update mode button labels
+  const _allLbl=document.getElementById('pm-all-lbl');
+  if(_allLbl) _allLbl.textContent='All '+p.activeN+' active roles';
+}
+}[pmLv]||.46;
   const exFlt=r=>['Cap-Exempt','Direct Outreach','Below $75K'].includes(r[FIELD.visa]);
   const p1ex=arr=>(1-arr.filter(exFlt).reduce((p,r)=>p*(1-r[FIELD.prob]/100),1))*100;
   const p1comb=arr=>{
