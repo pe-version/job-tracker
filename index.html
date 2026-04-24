@@ -2432,7 +2432,7 @@ function pAtLeastOne(roles, lotteryPct) {
   }, 1.0)) * 100;
 }
 function activeRoles(mode) {
-  const actSt = ['Open','Applied','Applied-Pending','Interviewing'];
+  const actSt = ['Open','Applied','Applied-Pending','Interviewing','Screening'];
   return ROWS.filter(r => {
     if (r[FIELD.avoid]) return false;
     const st = r[FIELD.status] || '';
