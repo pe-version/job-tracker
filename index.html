@@ -144,7 +144,7 @@ a:hover{text-decoration:underline}
     var sub=document.createElement("div");sub.style.cssText="color:#94a3b8;font-size:0.8rem;margin-bottom:1.5rem;";sub.textContent="Enter your access password to continue";
     var inp=document.createElement("input");inp.type="password";inp.placeholder="Password";inp.id="_pw_input";inp.autocomplete="current-password";inp.style.cssText="width:100%;box-sizing:border-box;padding:0.6rem 0.8rem;border-radius:7px;border:1px solid #3d4468;background:#0f1117;color:#e2e8f0;font-size:0.95rem;margin-bottom:0.75rem;outline:none;";
     var err=document.createElement("div");err.id="_pw_err";err.style.cssText="color:#f87171;font-size:0.8rem;min-height:1.1rem;margin-bottom:0.5rem;";
-    var btn=document.createElement("button");btn.id="_pw_btn";btn.textContent="Unlock";btn.style.cssText="width:100%;padding:0.65rem;border-radius:7px;border:none;background:#4f6ef7;color:#fff;font-size:0.60rem;font-weight:500;cursor:pointer;";
+    var btn=document.createElement("button");btn.id="_pw_btn";btn.textContent="Unlock";btn.style.cssText="width:100%;padding:0.65rem;border-radius:7px;border:none;background:#4f6ef7;color:#fff;font-size:0.95rem;font-weight:500;cursor:pointer;";
     box.appendChild(icon);box.appendChild(title);box.appendChild(sub);box.appendChild(inp);box.appendChild(err);box.appendChild(btn);ov.appendChild(box);document.body.prepend(ov);
     async function attempt(){var ok=await checkPw(inp.value);if(ok){sessionStorage.setItem(SK,"1");showTracker();}else{err.textContent="Incorrect password — please try again.";inp.value="";inp.focus();}}
     btn.addEventListener("click",attempt);inp.addEventListener("keydown",function(e){if(e.key==="Enter")attempt();});inp.focus();
@@ -443,20 +443,14 @@ a:hover{text-decoration:underline}
   <!-- TIER 1: URGENT -->
 
   <div id="_inflight_section" style="background:#f0f4ff;border:1px solid #c0cfee;border-radius:8px;padding:12px 16px;margin-bottom:18px;">
-  <div style="font-weight:600;font-size:13px;color:#1a1a1a;margin-bottom:8px;">✈️ Applications in flight — 19 active · 4 rejected (VUMC R-57410, R-52895, AB R0018452) · ⭐ HCA PM interview pending</div>
+  <div style="font-weight:600;font-size:13px;color:#1a1a1a;margin-bottom:8px;">✈️ Applications in flight — 18 active · 5 rejected/filled (VUMC R-57410, R-52895, AB R0018452) · ⭐ HCA PM interview pending</div>
     <table style="width:100%;border-collapse:collapse;font-size:12px;">
     <thead>
-                      <tr style="opacity:0.5;text-decoration:line-through;">
+                              <tr style="opacity:0.5;text-decoration:line-through;">
           <td style="padding:4px 8px;color:#888;">Brown &amp; Brown Ins.</td>
-          <td style="padding:4px 8px;font-size:11.5px;color:#888;">Client Engagement Acct Mgr (R26_0000001310) — ❌ Rejected Apr 24</td>
+          <td style="padding:4px 8px;font-size:11.5px;color:#888;">Assistant Underwriter (R26_0000000109) — ❌ Filled Apr 24</td>
           <td style="padding:4px 8px;font-size:11.5px;color:#888;">Apr 22</td>
           <td style="padding:4px 8px;font-size:11.5px;color:#888;">—</td>
-        </tr>
-        <tr>
-          <td style="padding:4px 8px;"><a href="https://bbinsurance.wd1.myworkdayjobs.com" target="_blank" style="color:#0a5c9a;text-decoration:none;">Brown &amp; Brown Ins.</a></td>
-          <td style="padding:4px 8px;font-size:11.5px;">Assistant Underwriter (R26_0000000109) · ⚠️ low sponsorship</td>
-          <td style="padding:4px 8px;font-size:11.5px;white-space:nowrap;">Apr 22</td>
-          <td style="padding:4px 8px;font-size:11.5px;white-space:nowrap;color:#c04000;">May 6</td>
         </tr>
             <tr>
           <td style="padding:4px 8px;"><a href="https://meharrymedicalcollege.wd12.myworkdayjobs.com/en-US/external" target="_blank" style="color:#0a5c9a;text-decoration:none;">Meharry</a></td>
@@ -1989,8 +1983,7 @@ const ROWS=[
 ["Brown & Brown Insurance",
  "Assistant Underwriter (R26_0000000109) — Remote (Colorado posted)",
  "Cap-Subject", "Medium",
- [["Underwriting","fin"],["Analytics","data"],["Risk Assessment","fin"],["MBA","biz"]],
- "Applied", 3, 60000, "$50K–$75K est.", "Low", "bbinsurance.wd1.myworkdayjobs.com R26_0000000109",
+ [["Underwriting","fin"],["Analytics","data"],["Risk Assessment","fin"],["MBA","biz"]], "Eliminated", 0, 60000, "$50K–$75K est.", "Low", "bbinsurance.wd1.myworkdayjobs.com R26_0000000109",
  "https://bbinsurance.wd1.myworkdayjobs.com/en-US/Careers/job/Remote---Colorado/Assistant-Underwriter_R26_0000000109-1","Brown & Brown Insurance. Assistant Underwriter — assess risk factors, support underwriting decisions, process submissions and policy documentation, assist senior underwriters. Remote (posted as Remote-Colorado). Applied Apr 22. ⚠️ SPONSORSHIP FLAG: same as Client Engagement role — B&B has virtually no H-1B sponsorship history (1 LCA/yr). Underwriting is a licensed profession in some states; verify whether P&C license is required at hire. MBA analytical + quantitative skills are relevant to underwriting. Confirm visa/sponsorship policy at phone screen.","P(offer) ~4%: entry-level underwriting, analytical skills transfer well. Same sponsorship caveat as Client Engagement role. ATS explicitly included OPT + sponsorship fields — candidate is in the pool, not pre-filtered out. Low-cost remote application. Follow up May 6.",
  false, "", false, 0],
 ["ACI Worldwide",
