@@ -2483,103 +2483,11 @@ function adjustedProb(r,outcomes,mults){
 
 // ── Live probability recalculation (correlation-aware) ───────
 // ── Shared probability utilities ────────────────────────────────────────────
-// pAtLeastOne(roles, lotteryPct) → P(at least one offer), 0-100 scale
-// lotteryPct: pass lottery win % (e.g. 46) for cap-subject per-role adj, or 0/null for none
-function pAtLeastOne(roles, lotteryPct) {
-  // lotteryPct: number → scenario override for all roles (e.g. test cases)
-  //             null/undefined → use per-role FIELD.lotteryLevel (default mode)
-  const LV_PCT = {1:.15, 2:.30, 3:.46, 4:.61};
-  const forcedFactor = (lotteryPct != null) ? (lotteryPct / 100) : null;
-  return (1 - roles.reduce((pNone, r) => {
-    let factor;
-    if (forcedFactor !== null) {
-      factor = forcedFactor; // flat scenario override
-    } else {
-      // Per-role: use role's lotteryLevel, or 0 (cap-exempt = no lottery factor)
-      const lv = r[FIELD.lotteryLevel] || 0;
-      factor = lv ? LV_PCT[lv] || 0.46 : 1; // 0 means cap-exempt: factor=1 (no discount)
-    }
-    const p = r[FIELD.prob] * factor / 100;
-    return pNone * (1 - p);
-  }, 1.0)) * 100;
-}
-function activeRoles(mode) {
-  const actSt = ['Open','Applied','Applied-Pending','Interviewing','Screening'];
-  return ROWS.filter(r => {
-    if (r[FIELD.avoid]) return false;
-    const st = r[FIELD.status] || '';
-    if (!actSt.some(s => st.startsWith(s))) return false;
-    if ((r[FIELD.prob] || 0) <= 0) return false;
-    if (mode === 's75') {
-      // Only filter on payMid if it's known (> 0); unknown pay → include in s75
-      if (r[FIELD.visa] === 'Cap-Exempt' && r[FIELD.payMid] > 0 && r[FIELD.payMid] < 50000) return false;
-      if (r[FIELD.visa] === 'Cap-Subject' && r[FIELD.payMid] > 0 && r[FIELD.payMid] < 70000) return false;
-    }
-    return true;
-  });
-}
+
 
 function computeLiveProbs(mode){
   const outcomes=getOutcomes();
-  const lv={function computeLiveProbs(mode){
-  const outcomes=getOutcomes();
-  const lv={1:.15,2:.30,3:.46,4:.61}[pmLv];
-  const{mults,notes}=buildGroupMultipliers(outcomes);
-  const RHO=0.6; // intra-employer correlation (0=independent, 1=fully correlated)
-
-  const hasOffer=ROWS.some(r=>{
-    if(r[FIELD.avoid])return false;
-    return(outcomes[makeKey(r)]||'')==='offer';
-  });
-  if(hasOffer)return{offerIn:true};
-
-  const active=activeRoles(mode).filter(r=>(outcomes[makeKey(r)]||'')!=='rejected');
-
-  // Group by employer
-  const byEmp={};
-  active.forEach(r=>{
-    const emp=r[FIELD.employer]||'Unknown';
-    if(!byEmp[emp])byEmp[emp]=[];
-    byEmp[emp].push(r);
-  });
-
-  // Effective per-role probability (includes lottery discount for cap-subject)
-  function effProb(r){
-    const base=adjustedProb(r,outcomes,mults);
-    if(r[FIELD.visa]==='Cap-Subject'){
-      const roleLv=r[FIELD.lotteryLevel]||pmLv;
-      const scenLv=pmLv!==3?pmLv:roleLv;
-      const lvPct={1:.15,2:.30,3:.46,4:.61}[scenLv]||lv;
-      return base*lvPct/100;
-    }
-    return base/100;
-  }
-
-  // Per-employer P(>=1 offer): mixture model
-  // P(emp) = RHO * p_max + (1-RHO) * (1 - prod(1-pi))
-  let pNone=1;
-  const empBreakdown=[];
-  Object.entries(byEmp).forEach(([emp,roles])=>{
-    const probs=roles.map(r=>effProb(r));
-    const pMax=Math.max(...probs);
-    const pIndep=1-probs.reduce((acc,p)=>acc*(1-p),1);
-    const pEmp=RHO*pMax+(1-RHO)*pIndep;
-    pNone*=(1-pEmp);
-    empBreakdown.push({emp,n:roles.length,pEmp:Math.round(pEmp*1000)/10});
-  });
-
-  const comb=Math.round((1-pNone)*1000)/10;
-  const rej=Object.values(outcomes).filter(v=>v==='rejected').length;
-  const iview=Object.values(outcomes).filter(v=>v==='interviewing').length;
-  const app=Object.values(outcomes).filter(v=>v==='applied').length;
-  return{
-    comb,
-    activeN:active.length,
-    empN:Object.keys(byEmp).length,
-    empBreakdown:empBreakdown.sort((a,b)=>b.pEmp-a.pEmp),
-    rej,iview,app,notes,offerIn:false
-  };
-}
+  const lv={
 ctive');
   const rows=document.getElementById('corr-active-rows');
   const entries=Object.entries(notes);
@@ -2592,65 +2500,10 @@ ctive');
   }).join('');
 }
 
-// Override buildProb to use live correlation-aware data
 function buildProb(){
   const p=computeLiveProbs(pmMode);
   if(p.offerIn){
-  function buildProb(){
-  const p=computeLiveProbs(pmMode);
-  if(p.offerIn){
-    document.getElementById('pval-comb').textContent='100%';
-    document.getElementById('psub-comb').textContent='Offer received — done!';
-    document.getElementById('pval-exempt').textContent='—';
-    document.getElementById('psub-exempt').textContent='';
-    document.getElementById('pval-subj').textContent='—';
-    document.getElementById('psub-subj').textContent='';
-    document.getElementById('pval-ovr').textContent='100%';
-    document.getElementById('psub-ovr').textContent='';
-    document.getElementById('corr-active').style.display='none';
-    return;
-  }
-  renderCorrActive(p.notes);
-  const zeroP=Math.round((100-p.comb)*10)/10;
-
-  // Primary metric
-  document.getElementById('pval-comb').textContent=p.comb+'%';
-  document.getElementById('psub-comb').textContent='P(zero offers) = '+zeroP+'%'+(p.rej?' · '+p.rej+' rejected':'')+(p.iview?' · '+p.iview+' interviewing':'');
-
-  // Repurpose exempt/subj panels to show employer breakdown
-  const top=p.empBreakdown.slice(0,2);
-  if(top[0]){
-    document.getElementById('pval-exempt').textContent=top[0].pEmp+'%';
-    document.getElementById('psub-exempt').textContent=top[0].emp+(top[0].n>1?' ('+top[0].n+' roles)':'');
-  }
-  if(top[1]){
-    document.getElementById('pval-subj').textContent=top[1].pEmp+'%';
-    document.getElementById('psub-subj').textContent=top[1].emp+(top[1].n>1?' ('+top[1].n+' roles)':'');
-  }
-
-  // Overview panel: show active/employer counts
-  document.getElementById('pval-ovr').textContent=p.comb+'%';
-  document.getElementById('psub-ovr').textContent=p.activeN+' active roles across '+p.empN+' employers · ρ=0.60';
-
-  // Update labels on the 4 panels
-  const lbl0=document.getElementById('plbl-exempt');
-  const lbl1=document.querySelector('[id="pval-subj"]')?.previousElementSibling;
-  if(lbl0) lbl0.textContent=(top[0]?top[0].emp+' P(≥1)':'Top employer');
-
-  // Update prob tree panel labels
-  document.getElementById('pt-root')&&(document.getElementById('pt-root').textContent='Correlated model · '+p.activeN+' roles · '+p.empN+' employers');
-  document.getElementById('pt-pexempt')&&(document.getElementById('pt-pexempt').textContent=p.comb+'%');
-  document.getElementById('pt-exempt-sub')&&(document.getElementById('pt-exempt-sub').textContent='P(≥1 offer)');
-  document.getElementById('pt-comb')&&(document.getElementById('pt-comb').textContent='P(≥1 offer) = '+p.comb+'%  [ρ=0.60 within employer]');
-  document.getElementById('pt-zero')&&(document.getElementById('pt-zero').textContent='P(no offer) = '+zeroP+'%');
-  document.getElementById('pt-miss-lbl')&&(document.getElementById('pt-miss-lbl').textContent='Enter job search');
-  document.getElementById('pt-miss-sub')&&(document.getElementById('pt-miss-sub').textContent=p.activeN+' active roles · '+p.empN+' employers');
-  document.getElementById('pt-delta')&&(document.getElementById('pt-delta').style.opacity='0');
-
-  // Update mode button labels
-  const _allLbl=document.getElementById('pm-all-lbl');
-  if(_allLbl) _allLbl.textContent='All '+p.activeN+' active roles';
-}
+  
 }[pmLv]||.46;
   const exFlt=r=>['Cap-Exempt','Direct Outreach','Below $75K'].includes(r[FIELD.visa]);
   const p1ex=arr=>(1-arr.filter(exFlt).reduce((p,r)=>p*(1-r[FIELD.prob]/100),1))*100;
@@ -2931,42 +2784,30 @@ render(sort(ROWS));
   function assert(cond, msg) { if (!cond) fails.push(msg); }
 
   try {
-    // Test 1: pAtLeastOne — cap-exempt per-role (lotteryLevel=0 → no lottery discount)
-    const mockExempt = [{[0]:'VU',[1]:'FA',[2]:'Cap-Exempt',[5]:'Open',[6]:10,[7]:80000,[16]:false,[17]:0}];
-    const p = pAtLeastOne(mockExempt, null);
-    assert(Math.abs(p - 10) < 0.01, 'T1: cap-exempt per-role should be 10%, got '+p.toFixed(3));
-
-    // Test 2: cap-subject at L3 per-role: 10% × 46% = 4.6%
-    const mockSubj = [{[0]:'Amazon',[1]:'FA',[2]:'Cap-Subject',[5]:'Open',[6]:10,[7]:90000,[16]:false,[17]:3}];
-    const pLott = pAtLeastOne(mockSubj, null);
-    assert(Math.abs(pLott - 4.6) < 0.01, 'T2: cap-subject L3 per-role should be 4.6%, got '+pLott.toFixed(3));
-
-    // Test 3: flat override still works: two cap-exempt 10% roles → P(≥1) ≈ 19%
-    const p2 = pAtLeastOne([mockExempt[0], mockExempt[0]], null);
-    assert(Math.abs(p2 - 19) < 0.01, 'T3: two cap-exempt 10% roles → 19%, got '+p2.toFixed(3));
-
-    // Test 4: FIELD schema
-    assert(FIELD.status === 5, 'T4: FIELD.status should be 5, got '+FIELD.status);
-    assert(FIELD.prob   === 6, 'T4: FIELD.prob should be 6, got '+FIELD.prob);
-    assert(FIELD.avoid  === 16,'T4: FIELD.avoid should be 16, got '+FIELD.avoid);
-
-    // Test 5: activeRoles only returns Open/Applied/Screening with prob>0
-    const active = activeRoles('all');
-    const badRow = active.find(r => {
-      const st = r[FIELD.status]||'';
-      return !['Open','Applied','Applied-Pending','Interviewing','Screening'].some(s=>st.startsWith(s));
-    });
-    assert(!badRow, 'T5: activeRoles returned non-active row: '+(badRow&&badRow[FIELD.role]));
-
-    if (fails.length === 0) {
-      console.log('✅ Tracker tests passed — '+active.length+' active roles');
-    } else {
-      fails.forEach(f => console.warn('❌ FAIL:', f));
-    }
-  } catch(e) {
-    console.warn('Tracker test error:', e.message||e);
-  }
-})();
+    const assert=(cond,msg)=>{if(!cond)fails.push(msg);};
+    // T1: ROWS array exists and is non-trivial
+    assert(Array.isArray(ROWS)&&ROWS.length>100,'T1: ROWS should have >100 entries, got '+ROWS.length);
+    // T2: All active rows have positive probability
+    const actSt2=['Open','Applied','Applied-Pending','Interviewing','Screening'];
+    const badProb=ROWS.filter(r=>!r[FIELD.avoid]&&actSt2.some(s=>(r[FIELD.status]||'').startsWith(s))&&(r[FIELD.prob]||0)<=0);
+    assert(badProb.length===0,'T2: '+badProb.length+' active row(s) have prob<=0');
+    // T3–T5: FIELD index sanity
+    assert(FIELD.status===5,'T3: FIELD.status should be 5, got '+FIELD.status);
+    assert(FIELD.prob===6,'T4: FIELD.prob should be 6, got '+FIELD.prob);
+    assert(FIELD.avoid===16,'T5: FIELD.avoid should be 16, got '+FIELD.avoid);
+    // T6: No rows with wrong field count
+    const badLen=ROWS.filter(r=>r.length!==18);
+    assert(badLen.length===0,'T6: '+badLen.length+' row(s) with wrong field count: '+badLen.map(r=>r[1]).join('; '));
+    // T7: activeRoles() only returns valid-status rows
+    const active7=activeRoles('all');
+    const validSt=['Open','Applied','Applied-Pending','Interviewing','Screening'];
+    const badRow=active7.find(r=>{const st=r[FIELD.status]||'';return!validSt.some(s=>st.startsWith(s));});
+    assert(!badRow,'T7: activeRoles returned non-active row: '+(badRow&&badRow[FIELD.role]));
+    // T8: computeLiveProbs returns a valid probability
+    const tp=computeLiveProbs('all');
+    assert(!tp.offerIn,'T8: offerIn should be false in test context');
+    assert(tp.comb>0&&tp.comb<=100,'T8: comb probability out of range: '+tp.comb);
+  } catch(e)();
 </script>
 
 
