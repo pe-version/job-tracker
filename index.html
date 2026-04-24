@@ -1404,12 +1404,12 @@ a:hover{text-decoration:underline}
 
 <div class="prob-metrics">
   <div class="prob-metric">
-    <div class="pm-lbl" id="plbl-exempt">Top employer</div>
+    <div class="pm-lbl" id="plbl-exempt">Cap-exempt P(≥1 offer)</div>
     <div class="pm-val" id="pval-exempt">—</div>
     <div class="pm-sub" id="psub-exempt">calculating…</div>
   </div>
   <div class="prob-metric">
-    <div class="pm-lbl">2nd employer</div>
+    <div class="pm-lbl">Cap-subject P(≥1+visa)</div>
     <div class="pm-val" id="pval-subj">—</div>
     <div class="pm-sub" id="psub-subj">calculating…</div>
   </div>
@@ -1419,7 +1419,7 @@ a:hover{text-decoration:underline}
     <div class="pm-sub" id="psub-comb">calculating…</div>
   </div>
   <div class="prob-metric">
-    <div class="pm-lbl">Active roles / employers</div>
+    <div class="pm-lbl">All employers combined</div>
     <div class="pm-val good" id="pval-ovr">—</div>
     <div class="pm-sub" id="psub-ovr">calculating…</div>
   </div>
@@ -2417,13 +2417,7 @@ function computeLiveProbs(mode){
 
   const active=activeRoles(mode).filter(r=>(outcomes[makeKey(r)]||'')!=='rejected');
 
-  const byEmp={};
-  active.forEach(r=>{
-    const emp=r[FIELD.employer]||'Unknown';
-    if(!byEmp[emp])byEmp[emp]=[];
-    byEmp[emp].push(r);
-  });
-
+  // Effective per-role probability (applies lottery discount for cap-subject)
   function effProb(r){
     const base=adjustedProb(r,outcomes,mults);
     if(r[FIELD.visa]==='Cap-Subject'){
@@ -2435,23 +2429,59 @@ function computeLiveProbs(mode){
     return base/100;
   }
 
-  let pNone=1;
+  // Correlated employer-grouped P(>=1) for a subset of roles
+  function corrP(roles){
+    if(!roles.length)return 0;
+    const byEmp={};
+    roles.forEach(r=>{
+      const emp=r[FIELD.employer]||'Unknown';
+      if(!byEmp[emp])byEmp[emp]=[];
+      byEmp[emp].push(r);
+    });
+    let pNone=1;
+    Object.values(byEmp).forEach(empRoles=>{
+      const probs=empRoles.map(r=>effProb(r));
+      const pMax=Math.max(...probs);
+      const pIndep=1-probs.reduce((acc,p)=>acc*(1-p),1);
+      pNone*=(1-(RHO*pMax+(1-RHO)*pIndep));
+    });
+    return Math.round((1-pNone)*1000)/10;
+  }
+
+  const exempt=active.filter(r=>r[FIELD.visa]==='Cap-Exempt'||r[FIELD.visa]==='Direct Outreach'||(mode==='all'&&r[FIELD.visa]==='Below $75K'));
+  const subj  =active.filter(r=>r[FIELD.visa]==='Cap-Subject');
+
+  const exemptP=corrP(exempt);
+  const subjP  =corrP(subj);
+
+  // Combined: group all active by employer, apply correlated model
+  const byEmpAll={};
+  active.forEach(r=>{
+    const emp=r[FIELD.employer]||'Unknown';
+    if(!byEmpAll[emp])byEmpAll[emp]=[];
+    byEmpAll[emp].push(r);
+  });
+  let pNoneAll=1;
   const empBreakdown=[];
-  Object.entries(byEmp).forEach(([emp,roles])=>{
+  Object.entries(byEmpAll).forEach(([emp,roles])=>{
     const probs=roles.map(r=>effProb(r));
     const pMax=Math.max(...probs);
     const pIndep=1-probs.reduce((acc,p)=>acc*(1-p),1);
     const pEmp=RHO*pMax+(1-RHO)*pIndep;
-    pNone*=(1-pEmp);
+    pNoneAll*=(1-pEmp);
     empBreakdown.push({emp,n:roles.length,pEmp:Math.round(pEmp*1000)/10});
   });
+  const comb=Math.round((1-pNoneAll)*1000)/10;
 
-  const comb=Math.round((1-pNone)*1000)/10;
   const rej=Object.values(outcomes).filter(v=>v==='rejected').length;
   const iview=Object.values(outcomes).filter(v=>v==='interviewing').length;
   const app=Object.values(outcomes).filter(v=>v==='applied').length;
   return{
-    comb,activeN:active.length,empN:Object.keys(byEmp).length,
+    exempt:exemptP, exemptN:exempt.length,
+    subj:subjP,     subjN:subj.length,
+    comb,
+    activeN:active.length,
+    empN:Object.keys(byEmpAll).length,
     empBreakdown:empBreakdown.sort((a,b)=>b.pEmp-a.pEmp),
     rej,iview,app,notes,offerIn:false
   };
@@ -2478,35 +2508,62 @@ function buildProb(){
   if(p.offerIn){
     document.getElementById('pval-comb').textContent='100%';
     document.getElementById('psub-comb').textContent='Offer received — done!';
-    ['pval-exempt','pval-subj','pval-ovr'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
-    ['psub-exempt','psub-subj','psub-ovr'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='';});
+    document.getElementById('pval-exempt').textContent='100%';
+    document.getElementById('psub-exempt').textContent='Offer secured';
+    document.getElementById('pval-subj').textContent='—';
+    document.getElementById('psub-subj').textContent='';
+    document.getElementById('pval-ovr').textContent='100%';
+    document.getElementById('psub-ovr').textContent='';
     const ca=document.getElementById('corr-active');if(ca)ca.style.display='none';
     return;
   }
   renderCorrActive(p.notes);
   const zeroP=Math.round((100-p.comb)*10)/10;
+
+  // Cap-exempt panel
+  const lbl0=document.getElementById('plbl-exempt');
+  if(lbl0)lbl0.textContent='Cap-exempt P(≥1 offer)';
+  document.getElementById('pval-exempt').textContent=p.exempt+'%';
+  document.getElementById('psub-exempt').textContent=p.exemptN+' roles · correlated (ρ=0.60)';
+
+  // Cap-subject panel
+  document.getElementById('pval-subj').textContent=p.subj+'%';
+  document.getElementById('psub-subj').textContent=p.subjN+' roles · per-role lottery + ρ=0.60';
+
+  // Combined panel (primary)
   document.getElementById('pval-comb').textContent=p.comb+'%';
   document.getElementById('psub-comb').textContent='P(zero offers) = '+zeroP+'%'+(p.rej?' · '+p.rej+' rejected':'')+(p.iview?' · '+p.iview+' interviewing':'');
-  const top=p.empBreakdown.slice(0,2);
-  if(top[0]){document.getElementById('pval-exempt').textContent=top[0].pEmp+'%';document.getElementById('psub-exempt').textContent=top[0].emp+(top[0].n>1?' ('+top[0].n+' roles)':'');}
-  if(top[1]){document.getElementById('pval-subj').textContent=top[1].pEmp+'%';document.getElementById('psub-subj').textContent=top[1].emp+(top[1].n>1?' ('+top[1].n+' roles)':'');}
+
+  // Overview panel
   document.getElementById('pval-ovr').textContent=p.comb+'%';
-  document.getElementById('psub-ovr').textContent=p.activeN+' active roles across '+p.empN+' employers · ρ=0.60';
-  const lbl0=document.getElementById('plbl-exempt');if(lbl0&&top[0])lbl0.textContent=top[0].emp+' P(≥1)';
-  const ids2=['pt-root','pt-pexempt','pt-exempt-sub','pt-comb','pt-zero','pt-miss-lbl','pt-miss-sub'];
+  document.getElementById('psub-ovr').textContent=p.activeN+' active roles · '+p.empN+' employers · ρ=0.60';
+
+  // Update panel 2 label
+  const lbl1q=document.querySelector('#pval-subj')?.previousElementSibling;
+  // (label already set in HTML)
+
+  // Probability tree
+  const lv={1:15,2:30,3:46,4:61}[pmLv];
+  const ids2=['pt-root','pt-pexempt','pt-exempt-sub','pt-psubj','pt-subj-sub','pt-win','pt-miss',
+              'pt-miss-lbl','pt-miss-sub','pt-comb','pt-zero'];
   ids2.forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
-    if(id==='pt-root')el.textContent='Correlated model · '+p.activeN+' roles · '+p.empN+' employers';
-    else if(id==='pt-pexempt')el.textContent=p.comb+'%';
-    else if(id==='pt-exempt-sub')el.textContent='P(≥1 offer)';
-    else if(id==='pt-comb')el.textContent='P(≥1 offer) = '+p.comb+'% [ρ=0.60]';
-    else if(id==='pt-zero')el.textContent='P(no offer) = '+zeroP+'%';
+    if(id==='pt-root')el.textContent='Apply to all '+p.activeN+' active roles';
+    else if(id==='pt-pexempt')el.textContent=p.exempt+'%';
+    else if(id==='pt-exempt-sub')el.textContent=p.exemptN+' cap-exempt (corr.)';
+    else if(id==='pt-psubj')el.textContent=p.subj+'%';
+    else if(id==='pt-subj-sub')el.textContent=p.subjN+' cap-subject (lottery+corr.)';
+    else if(id==='pt-win')el.textContent='Win · '+(lv||46)+'%';
+    else if(id==='pt-miss')el.textContent='Miss · '+(100-(lv||46))+'%';
     else if(id==='pt-miss-lbl')el.textContent='Enter job search';
-    else if(id==='pt-miss-sub')el.textContent=p.activeN+' active roles · '+p.empN+' employers';
+    else if(id==='pt-miss-sub')el.textContent=p.activeN+' active roles';
+    else if(id==='pt-comb')el.textContent='Combined P(≥1) = '+p.comb+'% [ρ=0.60]';
+    else if(id==='pt-zero')el.textContent='P(no offer) = '+zeroP+'%';
   });
   const d=document.getElementById('pt-delta');if(d)d.style.opacity='0';
   const al=document.getElementById('pm-all-lbl');if(al)al.textContent='All '+p.activeN+' active roles';
 }
+
 
 function updateCompare(allPool,svPool){
   if(!allPool||!svPool)return;
