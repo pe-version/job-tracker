@@ -2174,10 +2174,17 @@ function filter(){
 function sort(d){
   if(sortCol===-1)return d;
   const PRIORD={High:0,Medium:1,Monitor:2,AVOID:3};
+  const STATORD={Interviewing:0,Screening:1,Applied:2,'Applied-Pending':3,Open:4,Monitor:5,Eliminated:6,Rejected:7,AVOID:8};
   return[...d].sort((a,b)=>{
     if(sortCol===6){const aA=a[16],bA=b[16];if(aA&&bA)return 0;if(aA)return 1;if(bA)return -1;return(a[6]-b[6])*sortDir;}
     if(sortCol===7)return(a[7]-b[7])*sortDir;
     if(sortCol===3){const ao=PRIORD[a[3]]??99,bo=PRIORD[b[3]]??99;return(ao-bo)*sortDir;}
+    if(sortCol===5){
+      const as2=String(a[5]||''),bs2=String(b[5]||'');
+      const ao=STATORD[as2]??STATORD[Object.keys(STATORD).find(k=>as2.startsWith(k))]??50;
+      const bo2=STATORD[bs2]??STATORD[Object.keys(STATORD).find(k=>bs2.startsWith(k))]??50;
+      return(ao-bo2)*sortDir;
+    }
     const av=Array.isArray(a[sortCol])?a[sortCol].map(x=>x[0]).join(','):String(a[sortCol]||'');
     const bv=Array.isArray(b[sortCol])?b[sortCol].map(x=>x[0]).join(','):String(b[sortCol]||'');
     return av.localeCompare(bv)*sortDir;
